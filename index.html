@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AN ASHRAF ANWARI</title>
+  <!-- Google Fonts & Material Symbols -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <!-- Barcode & QR Code generators for crisp library labels -->
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- App Container (Google Pay App Shell) -->
+  <div class="gpay-app">
+
+    <!-- Top Header (Google Pay style profile & quick search) -->
+    <header class="gpay-header">
+      <div class="header-top">
+        <div class="brand-badge">
+          <div class="brand-logo-circle">
+            <span class="material-symbols-rounded">menu_book</span>
+          </div>
+          <div class="brand-text">
+            <div class="brand-sub-row">
+              <span class="brand-sub">Personal Library</span>
+              <span class="backend-status-pill" id="backendStatusPill" title="Connected to Dynamic Backend • Auto Syncs Every 5s">
+                <span class="status-dot"></span>
+                <span id="backendStatusText">Backend Live • 5s</span>
+              </span>
+            </div>
+            <h1 class="brand-name">ashraf ahmed</h1>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button id="openBatchQrHeaderBtn" class="icon-circle-btn" title="Batch Print Multiple QR Codes" aria-label="Batch Print QRs">
+            <span class="material-symbols-rounded">qr_code_2</span>
+          </button>
+          <button id="openBackupBtn" class="icon-circle-btn" title="Backup & Restore Library Data" aria-label="Backup Data">
+            <span class="material-symbols-rounded">cloud_sync</span>
+          </button>
+          <button id="lockLibraryBtn" class="icon-circle-btn" title="Lock Library" aria-label="Lock Library">
+            <span class="material-symbols-rounded">lock</span>
+          </button>
+          <button id="themeToggleBtn" class="icon-circle-btn" title="Toggle Theme" aria-label="Toggle dark mode">
+            <span class="material-symbols-rounded">dark_mode</span>
+          </button>
+          <div class="profile-avatar" id="profileAvatarBtn" title="Library Admin & Security Settings">
+            <span class="avatar-text">PL</span>
+            <span class="online-indicator"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Google Pay Pill Search Bar -->
+      <div class="gpay-search-wrapper">
+        <div class="gpay-search-bar">
+          <span class="material-symbols-rounded search-icon">search</span>
+          <input type="text" id="searchInput" placeholder="Search by book name, author, book no..." autocomplete="off">
+          <button id="clearSearchBtn" class="clear-btn" style="display: none;" aria-label="Clear search">
+            <span class="material-symbols-rounded">close</span>
+          </button>
+          <button type="button" class="chat-search-pill-btn" id="openChatSearchFromBarBtn" title="Chat Search: Ask for any author">
+            <span class="material-symbols-rounded">forum</span>
+            <span class="chat-pill-label">Chat Search</span>
+          </button>
+          <div class="search-divider"></div>
+          <button class="voice-search-icon" id="quickFilterBtn" title="Filter options">
+            <span class="material-symbols-rounded">tune</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="gpay-main">
+
+      <!-- Google Pay Style Quick Actions Grid -->
+      <section class="quick-actions-section">
+        <div class="quick-actions-grid">
+          <!-- 1. Add Book -->
+          <button class="action-item" id="openAddBookBtn">
+            <div class="action-icon-circle blue">
+              <span class="material-symbols-rounded">add</span>
+            </div>
+            <span class="action-label">Add Book</span>
+          </button>
+
+          <!-- 2. Chat Search (Conversational Author Search) -->
+          <button class="action-item" id="openChatSearchQuickBtn" title="Chat Search for Books & Authors">
+            <div class="action-icon-circle cyan">
+              <span class="material-symbols-rounded">forum</span>
+            </div>
+            <span class="action-label">Chat Search</span>
+          </button>
+
+          <!-- 3. Backup & Restore Data -->
+          <button class="action-item" id="quickBackupBtn" title="Backup & Restore Library Data">
+            <div class="action-icon-circle green">
+              <span class="material-symbols-rounded">cloud_sync</span>
+            </div>
+            <span class="action-label">Backup Data</span>
+          </button>
+
+          <!-- 4. Check Available Books (Key Feature) -->
+          <button class="action-item" id="filterAvailableBtn">
+            <div class="action-icon-circle teal">
+              <span class="material-symbols-rounded">check_circle</span>
+            </div>
+            <span class="action-label">Available Only</span>
+          </button>
+
+          <!-- 5. Add Category -->
+          <button class="action-item" id="openAddCategoryBtn">
+            <div class="action-icon-circle purple">
+              <span class="material-symbols-rounded">category</span>
+            </div>
+            <span class="action-label">Categories</span>
+          </button>
+
+          <!-- 6. Print Multiple QRs & Labels (Batch Studio) -->
+          <button class="action-item" id="quickBatchQrBtn" title="Batch Print Multiple QR Codes & Labels">
+            <div class="action-icon-circle indigo">
+              <span class="material-symbols-rounded">qr_code_2</span>
+            </div>
+            <span class="action-label">Print QRs</span>
+          </button>
+
+          <!-- 7. Print Label Studio / Insights -->
+          <button class="action-item" id="quickStatsBtn">
+            <div class="action-icon-circle yellow">
+              <span class="material-symbols-rounded">analytics</span>
+            </div>
+            <span class="action-label">Library Insights</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Availability Quick Toggle Banner (Google Pay Prominent Card) -->
+      <section class="gpay-card promo-banner">
+        <div class="promo-content">
+          <div class="promo-text">
+            <div class="availability-badge-live">
+              <span class="pulse-dot"></span>
+              <span id="liveAvailabilityCounter">Loading shelf status...</span>
+            </div>
+            <h2 class="promo-title">Book Availability Checker</h2>
+            <p class="promo-desc">Instantly verify books ready on shelf or out for reading</p>
+          </div>
+          <div class="promo-action">
+            <label class="gpay-switch" title="Toggle Available Books Only">
+              <input type="checkbox" id="availabilityToggleCheckbox">
+              <span class="switch-slider"></span>
+            </label>
+            <span class="switch-caption" id="switchLabel">All Books</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Category Chips Scroll (Google Pay Contact / Tag Style) -->
+      <section class="category-chips-section">
+        <div class="chips-scroll-container" id="categoryChipsContainer">
+          <!-- Dynamic category chips will be injected here -->
+        </div>
+      </section>
+
+      <!-- Sub-Category Chips Scroll (Google Pay Secondary Filter Pills) -->
+      <section class="sub-category-chips-section" id="subCategoryChipsSection" style="display: none;">
+        <div class="sub-chips-header">
+          <span class="sub-chips-label" id="subChipsCategoryLabel">Sub-Categories:</span>
+        </div>
+        <div class="sub-chips-scroll-container" id="subCategoryChipsContainer">
+          <!-- Dynamic sub-category chips will be injected here -->
+        </div>
+      </section>
+
+      <!-- Books Section Header -->
+      <section class="shelf-header">
+        <div class="section-title-wrap">
+          <h3 class="section-title" id="shelfDisplayTitle">All Books in Library</h3>
+          <span class="item-count-chip" id="booksCountBadge">0 books</span>
+        </div>
+        <div class="shelf-header-actions">
+          <button class="gpay-pill-btn secondary small" id="openBatchQrShelfBtn" title="Batch Print Multiple QR Codes">
+            <span class="material-symbols-rounded">qr_code_2</span>
+            <span>Print Multiple QRs</span>
+          </button>
+          <div class="shelf-sorting">
+            <button class="sort-chip active" data-sort="name">
+              <span class="material-symbols-rounded">sort_by_alpha</span> Title
+            </button>
+            <button class="sort-chip" data-sort="number">
+              <span class="material-symbols-rounded">tag</span> No.
+            </button>
+            <button class="sort-chip" data-sort="price">
+              <span class="material-symbols-rounded">payments</span> Price
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Books Grid (Google Pay Card Style) -->
+      <section class="books-display-section">
+        <div class="books-grid" id="booksGrid">
+          <!-- Book cards rendered via JS -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+          <div class="empty-icon-circle">
+            <span class="material-symbols-rounded">menu_book</span>
+          </div>
+          <h4>No books found</h4>
+          <p id="emptyStateMessage">No books match your current availability filter or search.</p>
+          <button class="gpay-pill-btn primary" id="emptyResetBtn">
+            <span class="material-symbols-rounded">refresh</span> View All Books
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Google Pay Floating Action Buttons -->
+    <button class="chat-floating-fab" id="openChatSearchFabBtn" title="Chat Search Assistant">
+      <span class="material-symbols-rounded">forum</span>
+      <span class="fab-chat-text">Chat Search</span>
+    </button>
+    <button class="gpay-fab" id="fabAddBook" title="Add New Book">
+      <span class="material-symbols-rounded">add</span>
+      <span class="fab-text">New Book</span>
+    </button>
+
+    <!-- Bottom Navigation Bar (Google Pay style) -->
+    <nav class="gpay-bottom-nav">
+      <button class="nav-tab active" data-nav="all">
+        <span class="material-symbols-rounded">home</span>
+        <span class="tab-label">Home</span>
+      </button>
+      <button class="nav-tab" data-nav="chat" id="navChatTab">
+        <span class="material-symbols-rounded">forum</span>
+        <span class="tab-label">Chat</span>
+      </button>
+      <button class="nav-tab" data-nav="available">
+        <span class="material-symbols-rounded">inventory_2</span>
+        <span class="tab-label">Available</span>
+      </button>
+      <button class="nav-tab" data-nav="backup" id="navBackupTab">
+        <span class="material-symbols-rounded">cloud_sync</span>
+        <span class="tab-label">Backup</span>
+      </button>
+      <button class="nav-tab" data-nav="labels" id="navLabelsTab">
+        <span class="material-symbols-rounded">qr_code_2</span>
+        <span class="tab-label">QR Labels</span>
+      </button>
+      <button class="nav-tab" data-nav="stats">
+        <span class="material-symbols-rounded">insights</span>
+        <span class="tab-label">Insights</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- MODAL: ADD / EDIT BOOK (Google Pay Bottom Sheet / Dialog) -->
+  <div class="modal-backdrop" id="bookModalBackdrop">
+    <div class="gpay-bottom-sheet" id="bookModalSheet">
+      <div class="sheet-drag-handle"></div>
+
+      <div class="sheet-header">
+        <div class="header-titles">
+          <span class="sheet-subtitle">Library Catalog Entry</span>
+          <h2 class="sheet-title" id="bookModalTitle">Add New Book</h2>
+        </div>
+        <button class="modal-close-btn" id="closeBookModalBtn" aria-label="Close modal">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+
+      <form id="bookForm" class="sheet-form">
+        <input type="hidden" id="bookIdInput">
+
+        <!-- Cover Photo Upload Field -->
+        <div class="form-group cover-upload-group">
+          <label class="form-label">Book Cover Page Photo</label>
+          <div class="cover-uploader-box" id="coverUploadBox">
+            <div class="cover-preview-wrapper" id="coverPreviewWrapper" style="display: none;">
+              <img id="coverPreviewImg" src="" alt="Book Cover Preview">
+              <div class="cover-overlay-btns">
+                <button type="button" class="cover-btn" id="viewCoverPreviewFullBtn" title="View in Full Screen">
+                  <span class="material-symbols-rounded">fullscreen</span>
+                </button>
+                <button type="button" class="cover-btn" id="retakeCoverBtn" title="Retake / Change Photo">
+                  <span class="material-symbols-rounded">sync</span>
+                </button>
+                <button type="button" class="cover-btn danger" id="removeCoverBtn" title="Remove Cover">
+                  <span class="material-symbols-rounded">delete</span>
+                </button>
+              </div>
+            </div>
+            <div class="uploader-placeholder" id="uploaderPlaceholder">
+              <span class="material-symbols-rounded upload-icon">add_a_photo</span>
+              <p class="upload-title">Add Book Cover Photo</p>
+              <div class="upload-options-row">
+                <button type="button" class="upload-choice-btn file" id="chooseFileBtn">
+                  <span class="material-symbols-rounded">upload_file</span>
+                  <span>Upload File</span>
+                </button>
+                <button type="button" class="upload-choice-btn camera" id="openCameraBtn">
+                  <span class="material-symbols-rounded">photo_camera</span>
+                  <span>Use Camera</span>
+                </button>
+              </div>
+              <span class="upload-hint">Upload from storage or snap direct via camera</span>
+            </div>
+            <!-- File input for device storage -->
+            <input type="file" id="coverFileInput" accept="image/*" style="display: none;">
+            <!-- Direct native camera fallback -->
+            <input type="file" id="coverCameraInput" accept="image/*" capture="environment" style="display: none;">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <!-- Book Number -->
+          <div class="form-group flex-1">
+            <label class="form-label" for="bookNumberInput">Book Number / Accession ID <span
+                class="required">*</span></label>
+            <div class="input-container">
+              <span class="material-symbols-rounded input-icon">tag</span>
+              <input type="text" id="bookNumberInput" placeholder="e.g. LIB-1042" required>
+              <button type="button" class="auto-gen-btn" id="autoGenNumberBtn"
+                title="Auto generate unique book number">Auto</button>
+            </div>
+          </div>
+
+          <!-- Availability Status -->
+          <div class="form-group flex-1">
+            <label class="form-label" for="bookStatusSelect">Availability Status</label>
+            <div class="input-container">
+              <span class="material-symbols-rounded input-icon">check_circle</span>
+              <select id="bookStatusSelect" required>
+                <option value="Available">Available (On Shelf)</option>
+                <option value="Borrowed">Checked Out (Borrowed)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Book Name -->
+        <div class="form-group">
+          <label class="form-label" for="bookNameInput">Book Name / Title <span class="required">*</span></label>
+          <div class="input-container">
+            <span class="material-symbols-rounded input-icon">book</span>
+            <input type="text" id="bookNameInput" placeholder="e.g. Atomic Habits" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <!-- Author Name -->
+          <div class="form-group flex-1">
+            <label class="form-label" for="authorInput">Author Name <span class="required">*</span></label>
+            <div class="input-container">
+              <span class="material-symbols-rounded input-icon">person</span>
+              <input type="text" id="authorInput" placeholder="e.g. James Clear" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <!-- Main Category -->
+          <div class="form-group flex-1">
+            <label class="form-label" for="categorySelect">Main Category <span class="required">*</span></label>
+            <div class="input-container">
+              <span class="material-symbols-rounded input-icon">category</span>
+              <select id="categorySelect" required>
+                <!-- Injected via JS -->
+              </select>
+            </div>
+          </div>
+
+          <!-- Sub Category -->
+          <div class="form-group flex-1">
+            <label class="form-label" for="subCategorySelect">Sub-Category <span class="required">*</span></label>
+            <div class="input-container">
+              <span class="material-symbols-rounded input-icon">subdirectory_arrow_right</span>
+              <select id="subCategorySelect" required>
+                <!-- Injected via JS based on selected category -->
+              </select>
+              <button type="button" class="auto-gen-btn" id="quickAddSubCatBtn"
+                title="Add new sub-category to this category">+ New</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row three-cols">
+          <!-- Total Pages -->
+          <div class="form-group">
+            <label class="form-label" for="pagesInput">Total Pages <span class="required">*</span></label>
+            <div class="input-container">
+              <span class="material-symbols-rounded input-icon">auto_stories</span>
+              <input type="number" id="pagesInput" placeholder="320" min="1" required>
+            </div>
+          </div>
+
+          <!-- Price -->
+          <div class="form-group">
+            <label class="form-label" for="priceInput">Price (₹) <span></span></label>
+            <div class="input-container">
+              <span class="material-symbols-rounded input-icon">payments</span>
+              <input type="number" id="priceInput" placeholder="499" min="0" step="0.5" required>
+            </div>
+          </div>
+
+          <!-- Publishers -->
+
+          <div class="form-group">
+            <label class="form-label" for="publisherInput">Publisher <span class=""></span></label>
+            <div class="input-container">
+              <span class="material-symbols-rounded input-icon">domain</span>
+              <input type="text" id="publisherInput" placeholder="e.g. Penguin Random House" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shelf Location / Notes (Optional) -->
+        <div class="form-group">
+          <label class="form-label" for="shelfLocationInput">Shelf Location / Rack (Optional)</label>
+          <div class="input-container">
+            <span class="material-symbols-rounded input-icon">shelves</span>
+            <input type="text" id="shelfLocationInput" placeholder="e.g. Section B - Rack 3">
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="sheet-actions">
+          <button type="button" class="gpay-pill-btn secondary danger-btn" id="deleteCurrentBookBtn" style="display: none; margin-right: auto;">
+            <span class="material-symbols-rounded">delete</span>
+            Delete Book
+          </button>
+          <button type="button" class="gpay-pill-btn secondary" id="cancelBookBtn">Cancel</button>
+          <button type="submit" class="gpay-pill-btn primary" id="saveBookBtn">
+            <span class="material-symbols-rounded">save</span>
+            Save to Library
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: DIRECT CAMERA CAPTURE (Google Lens Style Viewfinder) -->
+  <div class="modal-backdrop" id="cameraModalBackdrop">
+    <div class="gpay-dialog-card camera-dialog" id="cameraDialog">
+      <div class="dialog-header">
+        <div class="dialog-title-wrap">
+          <span class="material-symbols-rounded label-icon-head blue">photo_camera</span>
+          <div>
+            <h3 class="dialog-title">Capture Cover Photo</h3>
+            <span class="dialog-sub">Align book cover inside the frame</span>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeCameraModalBtn" type="button" aria-label="Close camera">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+
+      <div class="dialog-body camera-modal-body">
+        <!-- Live Video Viewfinder Container -->
+        <div class="camera-viewfinder-wrapper" id="cameraViewfinderWrapper">
+          <video id="cameraVideo" autoplay playsinline muted></video>
+          <canvas id="cameraCanvas" style="display: none;"></canvas>
+
+          <!-- Google Lens / Camera Target Guide -->
+          <div class="camera-frame-guide" id="cameraFrameGuide">
+            <div class="guide-corner top-left"></div>
+            <div class="guide-corner top-right"></div>
+            <div class="guide-corner bottom-left"></div>
+            <div class="guide-corner bottom-right"></div>
+            <span class="guide-text">Position cover inside frame</span>
+          </div>
+
+          <!-- Snapshot preview after capture before confirm -->
+          <div class="snapshot-preview-overlay" id="snapshotPreviewOverlay" style="display: none;">
+            <img id="snapshotImg" src="" alt="Captured Snapshot">
+          </div>
+        </div>
+
+        <!-- Camera Controls Toolbar -->
+        <div class="camera-controls-toolbar" id="cameraControlsToolbar">
+          <button type="button" class="cam-aux-btn" id="switchCameraBtn" title="Switch Camera (Front/Back)">
+            <span class="material-symbols-rounded">flip_camera_ios</span>
+          </button>
+
+          <button type="button" class="cam-shutter-btn" id="captureSnapshotBtn" title="Snap Photo">
+            <span class="shutter-inner"></span>
+          </button>
+
+          <button type="button" class="cam-aux-btn" id="fallbackMobileCamBtn" title="Native Camera File Chooser">
+            <span class="material-symbols-rounded">upload</span>
+          </button>
+        </div>
+
+        <!-- Post Capture Actions (Retake / Accept) -->
+        <div class="post-capture-actions" id="postCaptureActions" style="display: none;">
+          <button type="button" class="gpay-pill-btn secondary" id="retakeSnapshotBtn">
+            <span class="material-symbols-rounded">restart_alt</span> Retake
+          </button>
+          <button type="button" class="gpay-pill-btn primary" id="confirmSnapshotBtn">
+            <span class="material-symbols-rounded">check</span> Use This Photo
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: FULL SCREEN COVER PAGE VIEWER -->
+  <div class="fullscreen-modal" id="fullscreenViewerModal">
+    <div class="fullscreen-topbar">
+      <div class="fullscreen-meta">
+        <span class="material-symbols-rounded">image</span>
+        <span id="fullscreenTitle">Book Cover</span>
+      </div>
+      <div class="fullscreen-controls">
+        <button class="fs-icon-btn" id="fsZoomOutBtn" title="Zoom Out">
+          <span class="material-symbols-rounded">zoom_out</span>
+        </button>
+        <button class="fs-icon-btn" id="fsZoomInBtn" title="Zoom In">
+          <span class="material-symbols-rounded">zoom_in</span>
+        </button>
+        <button class="fs-icon-btn" id="fsRotateBtn" title="Rotate">
+          <span class="material-symbols-rounded">rotate_right</span>
+        </button>
+        <button class="fs-icon-btn close" id="fsCloseBtn" title="Close Full Screen (Esc)">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+    </div>
+    <div class="fullscreen-body" id="fullscreenBody">
+      <img id="fullscreenImg" src="" alt="Full Screen Cover Photo">
+    </div>
+    <div class="fullscreen-footer" id="fullscreenFooter">
+      <p id="fullscreenAuthorDetails">Author • Category</p>
+    </div>
+  </div>
+
+  <!-- MODAL: PRINT LABEL SEPARATELY (Print Studio) -->
+  <div class="modal-backdrop" id="printModalBackdrop">
+    <div class="gpay-dialog-card" id="printDialog">
+      <div class="dialog-header">
+        <div class="dialog-title-wrap">
+          <span class="material-symbols-rounded label-icon-head">print</span>
+          <div>
+            <h3 class="dialog-title">Print Book Label</h3>
+            <span class="dialog-sub">Official AN ASHRF ANWARI label</span>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closePrintModalBtn">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+
+      <div class="dialog-body">
+        <!-- Label Format Selector -->
+        <div class="label-format-tabs">
+          <button class="format-tab active" data-format="spine">Standard Label</button>
+          <button class="format-tab" data-format="card">Ledger Grid Label</button>
+          <button class="format-tab" data-format="minimal">Barcode Sticker</button>
+          <button class="format-tab" data-format="qr">QR Code Label</button>
+        </div>
+
+        <!-- Printable Label Preview Area (This gets printed directly) -->
+        <div class="label-print-wrapper" id="printableLabelContainer">
+          <div class="official-library-label" id="renderedLabel">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <div class="print-hints">
+          <span class="material-symbols-rounded">verified</span>
+          <span>Official AN ASHRF ANWARI label featuring Book Number, Name, and Category. Formatted for sticker printers and A4 label sheets.</span>
+        </div>
+      </div>
+
+      <div class="dialog-footer">
+        <button class="gpay-pill-btn secondary" id="switchToBatchBtn">
+          <span class="material-symbols-rounded">qr_code_2</span>
+          Print Multiple QRs
+        </button>
+        <button class="gpay-pill-btn secondary" id="cancelPrintBtn">Close</button>
+        <button class="gpay-pill-btn primary" id="triggerPrintBtn">
+          <span class="material-symbols-rounded">print</span>
+          Print This Label Now
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: BATCH PRINT MULTIPLE QR CODES / LABELS (Batch QR Studio) -->
+  <div class="modal-backdrop" id="batchQrModalBackdrop">
+    <div class="gpay-dialog-card batch-qr-dialog" id="batchQrDialog">
+      <div class="dialog-header">
+        <div class="dialog-title-wrap">
+          <span class="material-symbols-rounded label-icon-head blue">qr_code_2</span>
+          <div>
+            <h3 class="dialog-title">Batch Print QR Codes & Labels</h3>
+            <span class="dialog-sub">Official AN ASHRF ANWARI multi-label sheet printer</span>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeBatchQrModalBtn" title="Close QR Studio">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+
+      <div class="dialog-body batch-qr-body">
+        <!-- Controls & Filters Toolbar -->
+        <div class="batch-controls-panel">
+          <div class="batch-filter-row">
+            <div class="batch-filter-group">
+              <label for="batchCategorySelect">Filter by Category:</label>
+              <select id="batchCategorySelect" class="gpay-select">
+                <option value="all">All Categories</option>
+              </select>
+            </div>
+            <div class="batch-filter-group">
+              <label for="batchStatusSelect">Availability:</label>
+              <select id="batchStatusSelect" class="gpay-select">
+                <option value="all">All Books</option>
+                <option value="Available">Available Only</option>
+              </select>
+            </div>
+            <div class="batch-filter-group">
+              <label for="batchSheetColumns">Sheet Columns:</label>
+              <select id="batchSheetColumns" class="gpay-select">
+                <option value="3" selected>3 Columns (A4 Sticker Sheet - 21/page)</option>
+                <option value="2">2 Columns (Large QR Cards)</option>
+                <option value="4">4 Columns (Compact QR Stickers)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Quick Action Buttons for Selection -->
+          <div class="batch-selection-bar">
+            <div class="batch-stats-badge">
+              <span class="material-symbols-rounded">verified</span>
+              <span id="batchCountText">Selected 0 of 0 books</span>
+            </div>
+            <div class="batch-btn-group">
+              <button type="button" class="gpay-chip-btn" id="batchSelectAllBtn">Select All</button>
+              <button type="button" class="gpay-chip-btn" id="batchDeselectAllBtn">Clear All</button>
+              <button type="button" class="gpay-chip-btn outline" id="batchToggleCustomBtn">
+                <span class="material-symbols-rounded">checklist</span>
+                <span>Customize List</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Collapsible Individual Book Selector -->
+          <div class="batch-custom-list-drawer" id="batchCustomListDrawer" style="display: none;">
+            <div class="batch-drawer-search">
+              <span class="material-symbols-rounded">search</span>
+              <input type="text" id="batchSearchInput" placeholder="Filter books to print...">
+            </div>
+            <div class="batch-books-checklist" id="batchBooksChecklist">
+              <!-- Checkboxes rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Sheet Preview Wrapper -->
+        <div class="batch-sheet-preview-header">
+          <span class="preview-tag">
+            <span class="material-symbols-rounded">preview</span>
+            Printable Sheet Preview (Ready for Standard Paper / Sticker Sheet)
+          </span>
+        </div>
+
+        <div class="batch-sheet-scroll-container">
+          <div class="batch-qr-print-grid grid-cols-3" id="printableBatchQrContainer">
+            <!-- Dynamic QR Cards rendered here -->
+          </div>
+        </div>
+
+        <div class="print-hints">
+          <span class="material-symbols-rounded">lightbulb</span>
+          <span>Tip: In your browser Print dialog, choose <strong>Destination: Save as PDF</strong> or your printer, and ensure <strong>Background graphics</strong> is enabled.</span>
+        </div>
+      </div>
+
+      <div class="dialog-footer">
+        <button class="gpay-pill-btn secondary" id="cancelBatchQrBtn">Close</button>
+        <button class="gpay-pill-btn primary" id="triggerBatchPrintBtn">
+          <span class="material-symbols-rounded">print</span>
+          <span id="batchPrintBtnLabel">Print All Selected QRs Now</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / MANAGE CATEGORIES & SUB-CATEGORIES -->
+  <div class="modal-backdrop" id="categoryModalBackdrop">
+    <div class="gpay-dialog-card" id="categoryDialog">
+      <div class="dialog-header">
+        <div class="dialog-title-wrap">
+          <span class="material-symbols-rounded label-icon-head purple">category</span>
+          <div>
+            <h3 class="dialog-title">Category & Sub-Category Studio</h3>
+            <span class="dialog-sub">Organize main categories and their sub-topics</span>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeCategoryModalBtn">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+
+      <!-- Category Management Format Tabs -->
+      <div class="cat-mode-tabs">
+        <button type="button" class="cat-tab active" id="tabSubCategoriesBtn">
+          <span class="material-symbols-rounded">account_tree</span>
+          Sub-Categories
+        </button>
+        <button type="button" class="cat-tab" id="tabMainCategoriesBtn">
+          <span class="material-symbols-rounded">category</span>
+          Main Categories
+        </button>
+      </div>
+
+      <div class="dialog-body">
+        <!-- PANEL 1: SUB-CATEGORIES -->
+        <div id="panelSubCategories" class="cat-panel active">
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label class="form-label" for="manageCatSelect">Select Main Category:</label>
+            <div class="input-container">
+              <span class="material-symbols-rounded input-icon">category</span>
+              <select id="manageCatSelect">
+                <!-- Injected via JS -->
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label">Add New Sub-Category:</label>
+            <div class="add-cat-input-row">
+              <input type="text" id="newSubCategoryInput" placeholder="e.g. Biology, Space, Human Anatomy"
+                maxlength="35">
+              <button class="gpay-pill-btn primary" id="saveSubCategoryBtn">
+                <span class="material-symbols-rounded">add</span> Add Sub-Category
+              </button>
+            </div>
+          </div>
+
+          <h4 class="dialog-section-label" id="currentSubCatsHeader">Existing Sub-Categories</h4>
+          <div class="existing-cat-list" id="existingSubCategoriesList">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- PANEL 2: MAIN CATEGORIES -->
+        <div id="panelMainCategories" class="cat-panel" style="display: none;">
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label">Add New Main Category:</label>
+            <div class="add-cat-input-row">
+              <input type="text" id="newCategoryInput" placeholder="e.g. Science, Technology, Arts" maxlength="30">
+              <button class="gpay-pill-btn primary" id="saveCategoryBtn">
+                <span class="material-symbols-rounded">add</span> Add Category
+              </button>
+            </div>
+          </div>
+
+          <h4 class="dialog-section-label">All Main Categories</h4>
+          <div class="existing-cat-list" id="existingCategoriesList">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button class="gpay-pill-btn primary" id="closeCategoryDoneBtn">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: LIBRARY INSIGHTS (Google Pay Analytics style) -->
+  <div class="modal-backdrop" id="statsModalBackdrop">
+    <div class="gpay-dialog-card" id="statsDialog">
+      <div class="dialog-header">
+        <div class="dialog-title-wrap">
+          <span class="material-symbols-rounded label-icon-head yellow">analytics</span>
+          <div>
+            <h3 class="dialog-title">Library Overview</h3>
+            <span class="dialog-sub">Collection statistics & total valuation</span>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeStatsModalBtn">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+      <div class="dialog-body">
+        <div class="stats-overview-grid">
+          <div class="stat-card">
+            <span class="stat-num" id="statTotalBooks">0</span>
+            <span class="stat-name">Total Books</span>
+          </div>
+          <div class="stat-card green">
+            <span class="stat-num" id="statAvailableBooks">0</span>
+            <span class="stat-name">Available on Shelf</span>
+          </div>
+          <div class="stat-card orange">
+            <span class="stat-num" id="statBorrowedBooks">0</span>
+            <span class="stat-name">Checked Out</span>
+          </div>
+          <div class="stat-card blue">
+            <span class="stat-num" id="statTotalPages">0</span>
+            <span class="stat-name">Total Pages</span>
+          </div>
+          <div class="stat-card purple wide">
+            <span class="stat-num" id="statTotalValuation">₹0</span>
+            <span class="stat-name">Total Library Collection Value</span>
+          </div>
+        </div>
+
+        <h4 class="dialog-section-label" style="margin-top: 16px;">Categories Breakdown</h4>
+        <div class="category-breakdown-list" id="categoryBreakdownList">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button class="gpay-pill-btn primary" id="closeStatsBtn2">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOOGLE PAY STYLE APP LOCK SCREEN -->
+  <div class="gpay-lock-screen" id="libraryLockScreen">
+    <div class="lock-card">
+      <div class="lock-brand-ring">
+        <div class="lock-logo-circle">
+          <span class="material-symbols-rounded">shield_person</span>
+        </div>
+      </div>
+
+      <h2 class="lock-title">ASHRAF AHMED </h2>
+      <p class="lock-subtitle">Enter PIN to access your personal library</p>
+
+      <!-- PIN Indicator Dots -->
+      <div class="pin-dots-container" id="pinDotsContainer">
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+      </div>
+
+      <!-- Hidden Keyboard Input for Hardware Keyboards -->
+      <input type="password" id="pinKeyboardInput" class="pin-keyboard-input" maxlength="6" autocomplete="off"
+        inputmode="numeric">
+
+      <!-- Lock Message / Hint -->
+      <div class="lock-message" id="lockMessage">
+        <span class="material-symbols-rounded" style="font-size: 15px;">info</span>
+        <span>Default PIN is <strong>1234</strong></span>
+      </div>
+
+      <!-- Google Pay Style Numeric Keypad -->
+      <div class="gpay-keypad" id="gpayKeypad">
+        <button type="button" class="key-btn" data-key="1">1</button>
+        <button type="button" class="key-btn" data-key="2">2</button>
+        <button type="button" class="key-btn" data-key="3">3</button>
+        <button type="button" class="key-btn" data-key="4">4</button>
+        <button type="button" class="key-btn" data-key="5">5</button>
+        <button type="button" class="key-btn" data-key="6">6</button>
+        <button type="button" class="key-btn" data-key="7">7</button>
+        <button type="button" class="key-btn" data-key="8">8</button>
+        <button type="button" class="key-btn" data-key="9">9</button>
+        <button type="button" class="key-btn action-key" id="keyResetBtn" title="Clear PIN">
+          <span class="material-symbols-rounded">restart_alt</span>
+        </button>
+        <button type="button" class="key-btn" data-key="0">0</button>
+        <button type="button" class="key-btn action-key" id="keyBackspaceBtn" title="Backspace">
+          <span class="material-symbols-rounded">backspace</span>
+        </button>
+      </div>
+
+      <!-- Footer Reset / Help Link -->
+      <div class="lock-footer-links">
+        <button type="button" class="lock-link-btn" id="forgotPinBtn">Forgot PIN / Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SECURITY & PIN SETTINGS -->
+  <div class="modal-backdrop" id="securitySettingsModalBackdrop">
+    <div class="gpay-dialog-card sm" id="securitySettingsDialog">
+      <div class="dialog-header">
+        <div class="dialog-title-wrap">
+          <span class="material-symbols-rounded label-icon-head blue">security</span>
+          <div>
+            <h3 class="dialog-title">Library Lock & PIN</h3>
+            <span class="dialog-sub">Manage password security</span>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeSecurityModalBtn">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+      <div class="dialog-body">
+        <!-- Toggle Lock Option -->
+        <div class="security-toggle-card">
+          <div class="sec-toggle-info">
+            <strong class="sec-toggle-title">Require PIN on Entry</strong>
+            <p class="sec-toggle-desc">Lock the library whenever the application is opened or refreshed</p>
+          </div>
+          <label class="gpay-switch">
+            <input type="checkbox" id="lockEnabledCheckbox" checked>
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+
+        <!-- Change PIN Card -->
+        <div class="change-pin-box">
+          <h4 class="dialog-section-label">Change PIN</h4>
+          <div class="form-group" style="margin-bottom: 10px;">
+            <label class="form-label" for="currentPinInput">Current PIN</label>
+            <div class="input-container">
+              <span class="material-symbols-rounded input-icon">lock</span>
+              <input type="password" id="currentPinInput" placeholder="Enter current PIN" maxlength="6">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label class="form-label" for="newPinInput">New 4-Digit PIN</label>
+            <div class="input-container">
+              <span class="material-symbols-rounded input-icon">pin</span>
+              <input type="password" id="newPinInput" placeholder="Enter new PIN (e.g. 5678)" maxlength="6">
+            </div>
+          </div>
+          <button class="gpay-pill-btn secondary" id="updatePinBtn" style="width: 100%;">
+            <span class="material-symbols-rounded">check</span> Save New PIN
+          </button>
+        </div>
+      </div>
+      <div class="dialog-footer" style="justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+        <button class="gpay-pill-btn secondary danger-text" id="lockNowBtn">
+          <span class="material-symbols-rounded">lock</span> Lock Now
+        </button>
+        <button class="gpay-pill-btn secondary" id="openBackupFromSecurityBtn">
+          <span class="material-symbols-rounded">cloud_sync</span> Backup & Restore
+        </button>
+        <button class="gpay-pill-btn primary" id="closeSecurityBtn2">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: BACKUP & RESTORE DATA STUDIO -->
+  <div class="modal-backdrop" id="backupModalBackdrop">
+    <div class="gpay-dialog-card" id="backupDialog">
+      <div class="dialog-header">
+        <div class="dialog-title-wrap">
+          <span class="material-symbols-rounded label-icon-head blue">cloud_sync</span>
+          <div>
+            <h3 class="dialog-title">Backup & Restore Studio</h3>
+            <span class="dialog-sub">Export or recover your entire library database</span>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeBackupModalBtn" type="button" aria-label="Close dialog">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+
+      <div class="dialog-body">
+        <!-- Summary Stats Card -->
+        <div class="backup-summary-card">
+          <div class="summary-stat-row">
+            <span class="stat-pill"><span class="material-symbols-rounded pill-icon">menu_book</span> <span id="backupStatBooks">0 Books</span></span>
+            <span class="stat-pill"><span class="material-symbols-rounded pill-icon">category</span> <span id="backupStatCategories">0 Categories</span></span>
+            <span class="stat-pill live"><span class="material-symbols-rounded pill-icon">sync</span> <span id="backupStatServer">Dynamic Sync Active</span></span>
+          </div>
+          <p class="summary-hint">Backups contain your full catalogue, category hierarchies, covers, and security settings.</p>
+        </div>
+
+        <!-- Export Action Card -->
+        <div class="backup-action-card">
+          <div class="backup-card-info">
+            <div class="b-icon-wrap blue">
+              <span class="material-symbols-rounded">download</span>
+            </div>
+            <div class="b-text-wrap">
+              <h4 class="b-card-title">Save & Export Backup</h4>
+              <p class="b-card-desc">Download a complete JSON backup to your computer or trigger a server snapshot</p>
+            </div>
+          </div>
+          <div class="backup-btn-group">
+            <button type="button" class="gpay-pill-btn secondary" id="downloadBackupBtn">
+              <span class="material-symbols-rounded">file_download</span> Download JSON
+            </button>
+            <button type="button" class="gpay-pill-btn primary" id="saveServerSnapshotBtn">
+              <span class="material-symbols-rounded">save</span> Server Snapshot
+            </button>
+          </div>
+        </div>
+
+        <!-- Import Action Card -->
+        <div class="backup-action-card">
+          <div class="backup-card-info">
+            <div class="b-icon-wrap green">
+              <span class="material-symbols-rounded">upload_file</span>
+            </div>
+            <div class="b-text-wrap">
+              <h4 class="b-card-title">Restore from Backup File</h4>
+              <p class="b-card-desc">Upload a previously exported PayLib JSON file to restore your catalogue</p>
+            </div>
+          </div>
+          <label class="gpay-pill-btn secondary" style="cursor: pointer; justify-content: center;">
+            <span class="material-symbols-rounded">upload</span> Choose Backup File to Restore
+            <input type="file" id="restoreFileInput" accept=".json" style="display: none;">
+          </label>
+        </div>
+
+        <!-- Server Snapshots List Section -->
+        <div class="backup-snapshots-section">
+          <div class="section-subhead-row">
+            <h4 class="dialog-section-label" style="margin: 0;">Server Snapshots</h4>
+            <button type="button" class="text-refresh-btn" id="refreshSnapshotsBtn">
+              <span class="material-symbols-rounded" style="font-size: 15px;">refresh</span> Refresh
+            </button>
+          </div>
+          <div class="snapshots-list" id="snapshotsList">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="backup-danger-box">
+          <div>
+            <div class="danger-title">Reset to Default Catalog</div>
+            <span style="font-size: 11.5px; color: var(--text-tertiary);">Replaces all books with original demo collection</span>
+          </div>
+          <button type="button" class="gpay-pill-btn secondary danger-btn" id="resetSampleDataBtn" style="padding: 6px 14px; font-size: 12px;">
+            <span class="material-symbols-rounded" style="font-size: 14px;">restart_alt</span> Reset
+          </button>
+        </div>
+      </div>
+
+      <div class="dialog-footer">
+        <button class="gpay-pill-btn primary" id="closeBackupBtn2">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: INTERACTIVE POPUP DIALOG (Confirm / Alert / Prompt) -->
+  <div class="modal-backdrop" id="customPopupBackdrop">
+    <div class="custom-popup-card" id="customPopupCard">
+      <div class="popup-top-bar">
+        <div class="popup-icon-wrapper" id="popupIconWrapper">
+          <span class="material-symbols-rounded popup-symbol" id="popupIcon">help</span>
+        </div>
+        <button class="modal-close-btn" id="popupCloseXBtn" type="button" aria-label="Close dialog">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+
+      <div class="popup-body-content">
+        <h3 class="popup-title" id="popupTitle">Please Confirm</h3>
+        <p class="popup-message" id="popupMessage">Are you sure you want to proceed?</p>
+
+        <div class="popup-input-group form-group" id="popupInputGroup" style="display: none;">
+          <label class="form-label" id="popupInputLabel" for="popupTextInput">Value</label>
+          <div class="input-container">
+            <input type="text" id="popupTextInput" placeholder="Enter text...">
+          </div>
+        </div>
+      </div>
+
+      <div class="popup-footer-actions">
+        <button type="button" class="gpay-pill-btn secondary" id="popupCancelBtn">Cancel</button>
+        <button type="button" class="gpay-pill-btn primary" id="popupConfirmBtn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CHAT SEARCH STUDIO (Conversational Library Search) -->
+  <div class="modal-backdrop" id="chatSearchModalBackdrop">
+    <div class="gpay-dialog-card chat-search-dialog" id="chatSearchDialog">
+      <!-- Header -->
+      <div class="dialog-header chat-dialog-header">
+        <div class="dialog-title-wrap">
+          <div class="chat-bot-avatar">
+            <span class="material-symbols-rounded">forum</span>
+            <span class="bot-online-indicator"></span>
+          </div>
+          <div>
+            <div class="chat-title-row">
+              <h3 class="dialog-title">Library Chat Search</h3>
+              <span class="chat-ai-badge">Instant Search</span>
+            </div>
+            <span class="dialog-sub">Search books by entering author name conversationally</span>
+          </div>
+        </div>
+        <div class="chat-header-actions">
+          <button type="button" class="icon-circle-btn sm" id="clearChatHistoryBtn" title="Restart Conversation">
+            <span class="material-symbols-rounded">refresh</span>
+          </button>
+          <button type="button" class="modal-close-btn" id="closeChatSearchBtn" aria-label="Close chat search">
+            <span class="material-symbols-rounded">close</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Author Suggestion Chips Bar -->
+      <div class="chat-suggestions-bar" id="chatSuggestionsBar">
+        <span class="chat-suggestions-label">Authors:</span>
+        <div class="chat-chips-scroll" id="chatChipsContainer">
+          <!-- Dynamically populated author chips -->
+        </div>
+      </div>
+
+      <!-- Messages Thread Stream -->
+      <div class="chat-messages-container" id="chatMessagesContainer">
+        <!-- Messages will be dynamically appended here -->
+      </div>
+
+      <!-- Chat Input Controls Form -->
+      <form class="chat-prompt-form" id="chatSearchForm">
+        <div class="chat-input-bar-wrap">
+          <span class="material-symbols-rounded chat-input-lead-icon">search</span>
+          <input type="text" id="chatSearchInputField" class="chat-text-input" placeholder="Type an author name (e.g. gfhtg) to find books..." autocomplete="off">
+          <button type="submit" class="chat-send-action-btn" id="chatSearchSubmitBtn" title="Send message (Enter)">
+            <span class="material-symbols-rounded">send</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION (Google Pay Snackbar) -->
+  <div class="gpay-toast" id="gpayToast">
+    <span class="material-symbols-rounded toast-icon" id="toastIcon">check_circle</span>
+    <span class="toast-message" id="toastMessage">Action completed successfully</span>
+  </div>
+
+  <!-- JavaScript application script -->
+  <script src="app.js"></script>
+</body>
+
+</html>

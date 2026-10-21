@@ -1,0 +1,57 @@
+{
+  "app": "PayLib",
+  "version": "1.0.0",
+  "exportedAt": "2026-10-21T14:30:00.044Z",
+  "stats": {
+    "totalBooks": 0,
+    "availableBooks": 0,
+    "totalCategories": 7
+  },
+  "data": {
+    "books": [],
+    "categories": {
+      "Science": [],
+      "Technology": [
+        "Software Engineering",
+        "Artificial Intelligence",
+        "Web Development",
+        "Mobile Apps",
+        "Cybersecurity"
+      ],
+      "Self-Help": [
+        "Habits & Productivity",
+        "Psychology & Mindset",
+        "Mindfulness",
+        "Personal Finance"
+      ],
+      "Fiction": [
+        "Classic Literature",
+        "Mystery & Thriller",
+        "Sci-Fi & Fantasy",
+        "Historical Fiction"
+      ],
+      "Business": [
+        "Startups & Entrepreneurship",
+        "Management & Leadership",
+        "Marketing & Sales",
+        "Economics"
+      ],
+      "Philosophy": [
+        "Stoicism",
+        "Ethics & Morality",
+        "Ancient Philosophy",
+        "Logic"
+      ],
+      "History": [
+        "World History",
+        "Ancient Civilizations",
+        "Military History",
+        "Biographies"
+      ]
+    },
+    "settings": {
+      "pin": "1234",
+      "lockEnabled": true
+    }
+  }
+}

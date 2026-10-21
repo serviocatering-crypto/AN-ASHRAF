@@ -1,0 +1,154 @@
+{
+  "app": "PayLib",
+  "version": "1.0.0",
+  "exportedAt": "2026-10-21T14:43:26.353Z",
+  "stats": {
+    "totalBooks": 6,
+    "availableBooks": 4,
+    "totalCategories": 7
+  },
+  "data": {
+    "books": [
+      {
+        "id": "book-1",
+        "bookNumber": "LIB-1001",
+        "name": "Atomic Habits",
+        "author": "James Clear",
+        "category": "Self-Help",
+        "subCategory": "Habits & Productivity",
+        "totalPages": 320,
+        "price": 499,
+        "publisher": "Penguin Random House",
+        "status": "Available",
+        "shelfLocation": "Rack A-01",
+        "addedDate": "2026-01-15",
+        "coverPhoto": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20560%22%20width%3D%22100%25%22%20height%3D%22100%25%22%3E%0A%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%3ClinearGradient%20id%3D%22grad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%231a73e8%22%20%2F%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230d47a1%22%20%2F%3E%0A%20%20%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%20%20%3Cpattern%20id%3D%22pattern%22%20width%3D%2240%22%20height%3D%2240%22%20patternUnits%3D%22userSpaceOnUse%22%3E%0A%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%2220%22%20cy%3D%2220%22%20r%3D%221.5%22%20fill%3D%22rgba(255%2C255%2C255%2C0.15)%22%2F%3E%0A%20%20%20%20%20%20%3C%2Fpattern%3E%0A%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22url(%23grad)%22%20%2F%3E%0A%20%20%20%20%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22url(%23pattern)%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%2218%22%20height%3D%22560%22%20fill%3D%22rgba(0%2C0%2C0%2C0.2)%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2218%22%20y%3D%220%22%20width%3D%222%22%20height%3D%22560%22%20fill%3D%22rgba(255%2C255%2C255%2C0.2)%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2240%22%20y%3D%2244%22%20width%3D%22130%22%20height%3D%2226%22%20rx%3D%2213%22%20fill%3D%22rgba(255%2C255%2C255%2C0.25)%22%20%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%22105%22%20y%3D%2261%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2211%22%20font-weight%3D%22700%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.5%22%3ESELF-HELP%3C%2Ftext%3E%0A%20%20%20%20%3Ctext%20x%3D%2244%22%20y%3D%22190%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2228%22%20font-weight%3D%22800%22%3E%0A%20%20%20%20%20%20%3Ctspan%20x%3D%2244%22%20dy%3D%220%22%3EAtomic%20Habits%3C%2Ftspan%3E%0A%20%20%20%20%20%20%3Ctspan%20x%3D%2244%22%20dy%3D%2234%22%3E%3C%2Ftspan%3E%0A%20%20%20%20%3C%2Ftext%3E%0A%20%20%20%20%3Crect%20x%3D%2244%22%20y%3D%22270%22%20width%3D%2256%22%20height%3D%224%22%20rx%3D%222%22%20fill%3D%22%23ffffff%22%20opacity%3D%220.8%22%20%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%2244%22%20y%3D%22320%22%20fill%3D%22rgba(255%2C255%2C255%2C0.9)%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22600%22%3EBY%20JAMES%20CLEAR%3C%2Ftext%3E%0A%20%20%20%20%3Ccircle%20cx%3D%22330%22%20cy%3D%22480%22%20r%3D%2234%22%20fill%3D%22rgba(255%2C255%2C255%2C0.18)%22%20%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%22330%22%20y%3D%22486%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22800%22%20text-anchor%3D%22middle%22%3ELIB%3C%2Ftext%3E%0A%20%20%3C%2Fsvg%3E"
+      },
+      {
+        "id": "book-2",
+        "bookNumber": "LIB-1002",
+        "name": "Clean Architecture",
+        "author": "Robert C. Martin",
+        "category": "Technology",
+        "subCategory": "Software Engineering",
+        "totalPages": 432,
+        "price": 850,
+        "publisher": "Prentice Hall",
+        "status": "Available",
+        "shelfLocation": "Tech Shelf 3",
+        "addedDate": "2026-02-10",
+        "coverPhoto": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20560%22%20width%3D%22100%25%22%20height%3D%22100%25%22%3E%0A%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%3ClinearGradient%20id%3D%22grad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230f9d58%22%20%2F%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230b6623%22%20%2F%3E%0A%20%20%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%20%20%3Cpattern%20id%3D%22pattern%22%20width%3D%2240%22%20height%3D%2240%22%20patternUnits%3D%22userSpaceOnUse%22%3E%0A%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%2220%22%20cy%3D%2220%22%20r%3D%221.5%22%20fill%3D%22rgba(255%2C255%2C255%2C0.15)%22%2F%3E%0A%20%20%20%20%20%20%3C%2Fpattern%3E%0A%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22url(%23grad)%22%20%2F%3E%0A%20%20%20%20%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22url(%23pattern)%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%2218%22%20height%3D%22560%22%20fill%3D%22rgba(0%2C0%2C0%2C0.2)%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2218%22%20y%3D%220%22%20width%3D%222%22%20height%3D%22560%22%20fill%3D%22rgba(255%2C255%2C255%2C0.2)%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2240%22%20y%3D%2244%22%20width%3D%22130%22%20height%3D%2226%22%20rx%3D%2213%22%20fill%3D%22rgba(255%2C255%2C255%2C0.25)%22%20%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%22105%22%20y%3D%2261%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2211%22%20font-weight%3D%22700%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.5%22%3ETECHNOLOGY%3C%2Ftext%3E%0A%20%20%20%20%3Ctext%20x%3D%2244%22%20y%3D%22190%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2228%22%20font-weight%3D%22800%22%3E%0A%20%20%20%20%20%20%3Ctspan%20x%3D%2244%22%20dy%3D%220%22%3EClean%20Architecture%3C%2Ftspan%3E%0A%20%20%20%20%20%20%3Ctspan%20x%3D%2244%22%20dy%3D%2234%22%3E%3C%2Ftspan%3E%0A%20%20%20%20%3C%2Ftext%3E%0A%20%20%20%20%3Crect%20x%3D%2244%22%20y%3D%22270%22%20width%3D%2256%22%20height%3D%224%22%20rx%3D%222%22%20fill%3D%22%23ffffff%22%20opacity%3D%220.8%22%20%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%2244%22%20y%3D%22320%22%20fill%3D%22rgba(255%2C255%2C255%2C0.9)%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22600%22%3EBY%20ROBERT%20C.%20MARTIN%3C%2Ftext%3E%0A%20%20%20%20%3Ccircle%20cx%3D%22330%22%20cy%3D%22480%22%20r%3D%2234%22%20fill%3D%22rgba(255%2C255%2C255%2C0.18)%22%20%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%22330%22%20y%3D%22486%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22800%22%20text-anchor%3D%22middle%22%3ELIB%3C%2Ftext%3E%0A%20%20%3C%2Fsvg%3E"
+      },
+      {
+        "id": "book-3",
+        "bookNumber": "LIB-1003",
+        "name": "To Kill a Mockingbird",
+        "author": "Harper Lee",
+        "category": "Fiction",
+        "subCategory": "Classic Literature",
+        "totalPages": 281,
+        "price": 399,
+        "publisher": "J.B. Lippincott & Co.",
+        "status": "Borrowed",
+        "shelfLocation": "Fiction Row 2",
+        "addedDate": "2026-02-14",
+        "coverPhoto": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20560%22%20width%3D%22100%25%22%20height%3D%22100%25%22%3E%0A%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%3ClinearGradient%20id%3D%22grad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%238430ce%22%20%2F%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%234a148c%22%20%2F%3E%0A%20%20%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%20%20%3Cpattern%20id%3D%22pattern%22%20width%3D%2240%22%20height%3D%2240%22%20patternUnits%3D%22userSpaceOnUse%22%3E%0A%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%2220%22%20cy%3D%2220%22%20r%3D%221.5%22%20fill%3D%22rgba(255%2C255%2C255%2C0.15)%22%2F%3E%0A%20%20%20%20%20%20%3C%2Fpattern%3E%0A%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22url(%23grad)%22%20%2F%3E%0A%20%20%20%20%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22url(%23pattern)%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%2218%22%20height%3D%22560%22%20fill%3D%22rgba(0%2C0%2C0%2C0.2)%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2218%22%20y%3D%220%22%20width%3D%222%22%20height%3D%22560%22%20fill%3D%22rgba(255%2C255%2C255%2C0.2)%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2240%22%20y%3D%2244%22%20width%3D%22130%22%20height%3D%2226%22%20rx%3D%2213%22%20fill%3D%22rgba(255%2C255%2C255%2C0.25)%22%20%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%22105%22%20y%3D%2261%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2211%22%20font-weight%3D%22700%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.5%22%3EFICTION%3C%2Ftext%3E%0A%20%20%20%20%3Ctext%20x%3D%2244%22%20y%3D%22190%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2228%22%20font-weight%3D%22800%22%3E%0A%20%20%20%20%20%20%3Ctspan%20x%3D%2244%22%20dy%3D%220%22%3ETo%20Kill%20a%20Mockingb%3C%2Ftspan%3E%0A%20%20%20%20%20%20%3Ctspan%20x%3D%2244%22%20dy%3D%2234%22%3Eird%3C%2Ftspan%3E%0A%20%20%20%20%3C%2Ftext%3E%0A%20%20%20%20%3Crect%20x%3D%2244%22%20y%3D%22270%22%20width%3D%2256%22%20height%3D%224%22%20rx%3D%222%22%20fill%3D%22%23ffffff%22%20opacity%3D%220.8%22%20%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%2244%22%20y%3D%22320%22%20fill%3D%22rgba(255%2C255%2C255%2C0.9)%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22600%22%3EBY%20HARPER%20LEE%3C%2Ftext%3E%0A%20%20%20%20%3Ccircle%20cx%3D%22330%22%20cy%3D%22480%22%20r%3D%2234%22%20fill%3D%22rgba(255%2C255%2C255%2C0.18)%22%20%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%22330%22%20y%3D%22486%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22800%22%20text-anchor%3D%22middle%22%3ELIB%3C%2Ftext%3E%0A%20%20%3C%2Fsvg%3E"
+      },
+      {
+        "id": "book-4",
+        "bookNumber": "LIB-1004",
+        "name": "A Brief History of Time",
+        "author": "Stephen Hawking",
+        "category": "Science",
+        "subCategory": "Space & Astronomy",
+        "totalPages": 256,
+        "price": 599,
+        "publisher": "Bantam Books",
+        "status": "Available",
+        "shelfLocation": "Sci Zone 1",
+        "addedDate": "2026-02-20",
+        "coverPhoto": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20560%22%20width%3D%22100%25%22%20height%3D%22100%25%22%3E%0A%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%3ClinearGradient%20id%3D%22grad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23e37400%22%20%2F%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23b06000%22%20%2F%3E%0A%20%20%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%20%20%3Cpattern%20id%3D%22pattern%22%20width%3D%2240%22%20height%3D%2240%22%20patternUnits%3D%22userSpaceOnUse%22%3E%0A%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%2220%22%20cy%3D%2220%22%20r%3D%221.5%22%20fill%3D%22rgba(255%2C255%2C255%2C0.15)%22%2F%3E%0A%20%20%20%20%20%20%3C%2Fpattern%3E%0A%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22url(%23grad)%22%20%2F%3E%0A%20%20%20%20%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22url(%23pattern)%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%2218%22%20height%3D%22560%22%20fill%3D%22rgba(0%2C0%2C0%2C0.2)%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2218%22%20y%3D%220%22%20width%3D%222%22%20height%3D%22560%22%20fill%3D%22rgba(255%2C255%2C255%2C0.2)%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2240%22%20y%3D%2244%22%20width%3D%22130%22%20height%3D%2226%22%20rx%3D%2213%22%20fill%3D%22rgba(255%2C255%2C255%2C0.25)%22%20%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%22105%22%20y%3D%2261%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2211%22%20font-weight%3D%22700%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.5%22%3ESCIENCE%3C%2Ftext%3E%0A%20%20%20%20%3Ctext%20x%3D%2244%22%20y%3D%22190%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2228%22%20font-weight%3D%22800%22%3E%0A%20%20%20%20%20%20%3Ctspan%20x%3D%2244%22%20dy%3D%220%22%3EA%20Brief%20History%20of%3C%2Ftspan%3E%0A%20%20%20%20%20%20%3Ctspan%20x%3D%2244%22%20dy%3D%2234%22%3E%20Time%3C%2Ftspan%3E%0A%20%20%20%20%3C%2Ftext%3E%0A%20%20%20%20%3Crect%20x%3D%2244%22%20y%3D%22270%22%20width%3D%2256%22%20height%3D%224%22%20rx%3D%222%22%20fill%3D%22%23ffffff%22%20opacity%3D%220.8%22%20%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%2244%22%20y%3D%22320%22%20fill%3D%22rgba(255%2C255%2C255%2C0.9)%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22600%22%3EBY%20STEPHEN%20HAWKING%3C%2Ftext%3E%0A%20%20%20%20%3Ccircle%20cx%3D%22330%22%20cy%3D%22480%22%20r%3D%2234%22%20fill%3D%22rgba(255%2C255%2C255%2C0.18)%22%20%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%22330%22%20y%3D%22486%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22800%22%20text-anchor%3D%22middle%22%3ELIB%3C%2Ftext%3E%0A%20%20%3C%2Fsvg%3E"
+      },
+      {
+        "id": "book-5",
+        "bookNumber": "LIB-1005",
+        "name": "The Psychology of Money",
+        "author": "Morgan Housel",
+        "category": "Business",
+        "subCategory": "Economics",
+        "totalPages": 252,
+        "price": 450,
+        "publisher": "Harriman House",
+        "status": "Available",
+        "shelfLocation": "Finance Rack 1",
+        "addedDate": "2026-03-01",
+        "coverPhoto": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20560%22%20width%3D%22100%25%22%20height%3D%22100%25%22%3E%0A%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%3ClinearGradient%20id%3D%22grad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%231e8e3e%22%20%2F%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230b6623%22%20%2F%3E%0A%20%20%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%20%20%3Cpattern%20id%3D%22pattern%22%20width%3D%2240%22%20height%3D%2240%22%20patternUnits%3D%22userSpaceOnUse%22%3E%0A%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%2220%22%20cy%3D%2220%22%20r%3D%221.5%22%20fill%3D%22rgba(255%2C255%2C255%2C0.15)%22%2F%3E%0A%20%20%20%20%20%20%3C%2Fpattern%3E%0A%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22url(%23grad)%22%20%2F%3E%0A%20%20%20%20%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22url(%23pattern)%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%2218%22%20height%3D%22560%22%20fill%3D%22rgba(0%2C0%2C0%2C0.2)%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2218%22%20y%3D%220%22%20width%3D%222%22%20height%3D%22560%22%20fill%3D%22rgba(255%2C255%2C255%2C0.2)%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2240%22%20y%3D%2244%22%20width%3D%22130%22%20height%3D%2226%22%20rx%3D%2213%22%20fill%3D%22rgba(255%2C255%2C255%2C0.25)%22%20%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%22105%22%20y%3D%2261%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2211%22%20font-weight%3D%22700%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.5%22%3EBUSINESS%3C%2Ftext%3E%0A%20%20%20%20%3Ctext%20x%3D%2244%22%20y%3D%22190%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2228%22%20font-weight%3D%22800%22%3E%0A%20%20%20%20%20%20%3Ctspan%20x%3D%2244%22%20dy%3D%220%22%3EThe%20Psychology%20of%20%3C%2Ftspan%3E%0A%20%20%20%20%20%20%3Ctspan%20x%3D%2244%22%20dy%3D%2234%22%3EMoney%3C%2Ftspan%3E%0A%20%20%20%20%3C%2Ftext%3E%0A%20%20%20%20%3Crect%20x%3D%2244%22%20y%3D%22270%22%20width%3D%2256%22%20height%3D%224%22%20rx%3D%222%22%20fill%3D%22%23ffffff%22%20opacity%3D%220.8%22%20%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%2244%22%20y%3D%22320%22%20fill%3D%22rgba(255%2C255%2C255%2C0.9)%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22600%22%3EBY%20MORGAN%20HOUSEL%3C%2Ftext%3E%0A%20%20%20%20%3Ccircle%20cx%3D%22330%22%20cy%3D%22480%22%20r%3D%2234%22%20fill%3D%22rgba(255%2C255%2C255%2C0.18)%22%20%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%22330%22%20y%3D%22486%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22800%22%20text-anchor%3D%22middle%22%3ELIB%3C%2Ftext%3E%0A%20%20%3C%2Fsvg%3E"
+      },
+      {
+        "id": "book-6",
+        "bookNumber": "LIB-1006",
+        "name": "Meditations",
+        "author": "Marcus Aurelius",
+        "category": "Philosophy",
+        "subCategory": "Stoicism",
+        "totalPages": 200,
+        "price": 299,
+        "publisher": "Penguin Classics",
+        "status": "Borrowed",
+        "shelfLocation": "Classics Bay",
+        "addedDate": "2026-03-05",
+        "coverPhoto": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20560%22%20width%3D%22100%25%22%20height%3D%22100%25%22%3E%0A%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%3ClinearGradient%20id%3D%22grad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%235f6368%22%20%2F%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23202124%22%20%2F%3E%0A%20%20%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%20%20%3Cpattern%20id%3D%22pattern%22%20width%3D%2240%22%20height%3D%2240%22%20patternUnits%3D%22userSpaceOnUse%22%3E%0A%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%2220%22%20cy%3D%2220%22%20r%3D%221.5%22%20fill%3D%22rgba(255%2C255%2C255%2C0.15)%22%2F%3E%0A%20%20%20%20%20%20%3C%2Fpattern%3E%0A%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22url(%23grad)%22%20%2F%3E%0A%20%20%20%20%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22url(%23pattern)%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%2218%22%20height%3D%22560%22%20fill%3D%22rgba(0%2C0%2C0%2C0.2)%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2218%22%20y%3D%220%22%20width%3D%222%22%20height%3D%22560%22%20fill%3D%22rgba(255%2C255%2C255%2C0.2)%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2240%22%20y%3D%2244%22%20width%3D%22130%22%20height%3D%2226%22%20rx%3D%2213%22%20fill%3D%22rgba(255%2C255%2C255%2C0.25)%22%20%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%22105%22%20y%3D%2261%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2211%22%20font-weight%3D%22700%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%220.5%22%3EPHILOSOPHY%3C%2Ftext%3E%0A%20%20%20%20%3Ctext%20x%3D%2244%22%20y%3D%22190%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2228%22%20font-weight%3D%22800%22%3E%0A%20%20%20%20%20%20%3Ctspan%20x%3D%2244%22%20dy%3D%220%22%3EMeditations%3C%2Ftspan%3E%0A%20%20%20%20%20%20%3Ctspan%20x%3D%2244%22%20dy%3D%2234%22%3E%3C%2Ftspan%3E%0A%20%20%20%20%3C%2Ftext%3E%0A%20%20%20%20%3Crect%20x%3D%2244%22%20y%3D%22270%22%20width%3D%2256%22%20height%3D%224%22%20rx%3D%222%22%20fill%3D%22%23ffffff%22%20opacity%3D%220.8%22%20%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%2244%22%20y%3D%22320%22%20fill%3D%22rgba(255%2C255%2C255%2C0.9)%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2215%22%20font-weight%3D%22600%22%3EBY%20MARCUS%20AURELIUS%3C%2Ftext%3E%0A%20%20%20%20%3Ccircle%20cx%3D%22330%22%20cy%3D%22480%22%20r%3D%2234%22%20fill%3D%22rgba(255%2C255%2C255%2C0.18)%22%20%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%22330%22%20y%3D%22486%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Plus%20Jakarta%20Sans'%2C%20sans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22800%22%20text-anchor%3D%22middle%22%3ELIB%3C%2Ftext%3E%0A%20%20%3C%2Fsvg%3E"
+      }
+    ],
+    "categories": {
+      "Science": [
+        "Biology",
+        "Space & Astronomy",
+        "Human Anatomy",
+        "Physics",
+        "Chemistry"
+      ],
+      "Technology": [
+        "Software Engineering",
+        "Artificial Intelligence",
+        "Web Development",
+        "Mobile Apps",
+        "Cybersecurity"
+      ],
+      "Self-Help": [
+        "Habits & Productivity",
+        "Psychology & Mindset",
+        "Mindfulness",
+        "Personal Finance"
+      ],
+      "Fiction": [
+        "Classic Literature",
+        "Mystery & Thriller",
+        "Sci-Fi & Fantasy",
+        "Historical Fiction"
+      ],
+      "Business": [
+        "Startups & Entrepreneurship",
+        "Management & Leadership",
+        "Marketing & Sales",
+        "Economics"
+      ],
+      "Philosophy": [
+        "Stoicism",
+        "Ethics & Morality",
+        "Ancient Philosophy",
+        "Logic"
+      ],
+      "History": [
+        "World History",
+        "Ancient Civilizations",
+        "Military History",
+        "Biographies"
+      ]
+    },
+    "settings": {
+      "pin": "1234",
+      "lockEnabled": true
+    }
+  }
+}
