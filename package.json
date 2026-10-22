@@ -1,8 +1,8 @@
 {
   "name": "my-library",
   "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
+  "description": "PayLib Library Management System",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",

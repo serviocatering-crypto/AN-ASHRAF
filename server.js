@@ -588,9 +588,9 @@ app.post("/api/backup/reset", (req, res) => {
 });
 
 // Start Server
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`===============================================`);
-  console.log(`PayLib Server running at http://localhost:${PORT}`);
+  console.log(`PayLib Server running on port ${PORT} (0.0.0.0:${PORT})`);
   console.log(`Data stored dynamically in: ${DATA_DIR}`);
   console.log(`===============================================`);
 });

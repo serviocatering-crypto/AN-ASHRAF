@@ -1,3 +1,8 @@
+// Environment Bridge: If invoked directly in Node.js (e.g. Render Start Command left as 'node app.js' or 'node .')
+if (typeof window === "undefined") {
+  module.exports = require("./server.js");
+} else {
+
 /**
  * Google PayLib - Personal Library Management Application
  * Complete Client-Side State, Persistence, Label Printing, & Fullscreen Viewer
@@ -89,7 +94,13 @@ let currentLabelFormat = "spine";
 // ==========================================
 // Dynamic Backend API Client & Persistent Storage
 // ==========================================
-const API_BASE = (window.location.protocol === "http:" || window.location.protocol === "https:") && window.location.port !== "3000"
+const isFileProtocol = typeof window !== "undefined" && window.location.protocol === "file:";
+const isLocalDevServer = typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
+  window.location.port !== "3000" &&
+  window.location.port !== "";
+
+const API_BASE = (isFileProtocol || isLocalDevServer)
   ? "http://localhost:3000/api"
   : "/api";
 
@@ -3572,3 +3583,4 @@ function escapeHtml(text) {
 }
 
 document.addEventListener("DOMContentLoaded", initApp);
+}
