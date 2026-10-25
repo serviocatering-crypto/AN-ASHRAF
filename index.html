@@ -864,8 +864,8 @@
 
       <!-- Lock Message / Hint -->
       <div class="lock-message" id="lockMessage">
-        <span class="material-symbols-rounded" style="font-size: 15px;">info</span>
-        <span>Default PIN is <strong>1234</strong></span>
+        <span class="material-symbols-rounded" style="font-size: 15px;">lock</span>
+        <span>Enter 4-digit security PIN</span>
       </div>
 
       <!-- Google Pay Style Numeric Keypad -->
@@ -888,9 +888,51 @@
         </button>
       </div>
 
-      <!-- Footer Reset / Help Link -->
-      <div class="lock-footer-links">
+      <!-- Footer Reset / Help Link (Hidden for Security) -->
+      <div class="lock-footer-links" style="display: none;">
         <button type="button" class="lock-link-btn" id="forgotPinBtn">Forgot PIN / Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTHENTIC BROWSER ERROR SCREEN: "THIS SITE IS NOT AVAILABLE" -->
+  <div class="site-unavailable-screen" id="siteUnavailableScreen" aria-hidden="true" style="display: none;">
+    <div class="browser-error-box">
+      <!-- Chrome folded document sad-face icon -->
+      <div class="browser-error-icon" aria-hidden="true">
+        <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M44 6H18C14.6863 6 12 8.68629 12 12V60C12 63.3137 14.6863 66 18 66H54C57.3137 66 60 63.3137 60 60V22L44 6Z" fill="#DADCE0"/>
+          <path d="M44 6V22H60L44 6Z" fill="#BDC1C6"/>
+          <circle cx="28" cy="38" r="3.2" fill="#5F6368"/>
+          <circle cx="44" cy="38" r="3.2" fill="#5F6368"/>
+          <path d="M26 49.5C29 46.5 43 46.5 46 49.5" stroke="#5F6368" stroke-width="3.2" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <h1 class="browser-error-title">This site is not available</h1>
+      <p class="browser-error-lead">
+        The webpage at <strong id="unavailableHostText">this site</strong> might be temporarily down or it may have moved permanently to a new web address.
+      </p>
+
+      <div class="browser-error-section">
+        <p class="browser-error-subhead">Try:</p>
+        <ul class="browser-error-list">
+          <li>Checking your connection</li>
+          <li>Checking the proxy, firewall, and DNS configuration</li>
+          <li>Running Windows Network Diagnostics</li>
+        </ul>
+      </div>
+
+      <div class="browser-error-code">ERR_CONNECTION_REFUSED</div>
+
+      <div class="browser-error-actions">
+        <button type="button" class="browser-reload-btn" id="unavailableReloadBtn">Reload</button>
+        <button type="button" class="browser-details-btn" id="unavailableDetailsBtn">Details</button>
+      </div>
+
+      <div class="browser-error-details" id="unavailableDetailsBox" style="display: none;">
+        <p>A connection attempt to the host failed. The server may be unreachable, down, or the requested port is not accepting connections.</p>
+        <p class="browser-error-meta">Error code: net::ERR_CONNECTION_REFUSED</p>
       </div>
     </div>
   </div>

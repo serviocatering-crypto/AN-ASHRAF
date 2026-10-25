@@ -3481,9 +3481,39 @@ function bindEventListeners() {
   if (updatePinBtn) updatePinBtn.addEventListener("click", updatePin);
   if (lockNowBtn) lockNowBtn.addEventListener("click", lockLibraryNow);
 
+  // Handlers for Fake Browser Error Screen ("This site is not available")
+  const unavailableReloadBtn = document.getElementById("unavailableReloadBtn");
+  if (unavailableReloadBtn) {
+    unavailableReloadBtn.addEventListener("click", () => {
+      unavailableReloadBtn.textContent = "Connecting...";
+      unavailableReloadBtn.disabled = true;
+      setTimeout(() => {
+        hideSiteUnavailableScreen();
+        unavailableReloadBtn.textContent = "Reload";
+        unavailableReloadBtn.disabled = false;
+        resetPinBuffer();
+        if (pinKeyboardInput) pinKeyboardInput.focus();
+      }, 450);
+    });
+  }
+
+  const unavailableDetailsBtn = document.getElementById("unavailableDetailsBtn");
+  const unavailableDetailsBox = document.getElementById("unavailableDetailsBox");
+  if (unavailableDetailsBtn && unavailableDetailsBox) {
+    unavailableDetailsBtn.addEventListener("click", () => {
+      const isHidden = unavailableDetailsBox.style.display === "none";
+      unavailableDetailsBox.style.display = isHidden ? "block" : "none";
+      unavailableDetailsBtn.textContent = isHidden ? "Hide details" : "Details";
+    });
+  }
+
   // Physical keyboard support for PIN input
   document.addEventListener("keydown", (e) => {
-    if (libraryLockScreen && !libraryLockScreen.classList.contains("unlocked")) {
+    const unavailableScreen = document.getElementById("siteUnavailableScreen");
+    if (unavailableScreen && unavailableScreen.style.display !== "none") {
+      return;
+    }
+    if (libraryLockScreen && !libraryLockScreen.classList.contains("unlocked") && libraryLockScreen.style.display !== "none") {
       if (e.key >= "0" && e.key <= "9") {
         handlePinDigit(e.key);
       } else if (e.key === "Backspace") {
@@ -3510,15 +3540,66 @@ function bindEventListeners() {
 // ==========================================
 // Google Pay Security & App Lock Implementation
 // ==========================================
+let originalDocumentTitle = document.title || "PayLib Library";
+
+function showSiteUnavailableScreen() {
+  const screen = document.getElementById("siteUnavailableScreen");
+  const hostText = document.getElementById("unavailableHostText");
+  if (hostText) {
+    hostText.textContent = window.location.host || window.location.hostname || "this site";
+  }
+
+  // Hide the lock screen
+  if (libraryLockScreen) {
+    libraryLockScreen.style.display = "none";
+  }
+
+  // Update document title to look like authentic browser error
+  originalDocumentTitle = document.title;
+  document.title = "This site is not available";
+
+  if (screen) {
+    screen.style.display = "flex";
+    screen.setAttribute("aria-hidden", "false");
+  }
+
+  // Reset PIN buffer
+  enteredPinBuffer = "";
+  updatePinDots();
+  if (pinKeyboardInput) pinKeyboardInput.value = "";
+}
+
+function hideSiteUnavailableScreen() {
+  const screen = document.getElementById("siteUnavailableScreen");
+  if (screen) {
+    screen.style.display = "none";
+    screen.setAttribute("aria-hidden", "true");
+  }
+  if (libraryLockScreen) {
+    libraryLockScreen.style.display = "flex";
+  }
+  if (originalDocumentTitle) {
+    document.title = originalDocumentTitle;
+  }
+}
+
 function initLockScreen() {
   if (lockEnabledCheckbox) {
     lockEnabledCheckbox.checked = lockEnabled;
   }
 
   if (!lockEnabled || isUnlocked) {
-    libraryLockScreen.classList.add("unlocked");
+    hideSiteUnavailableScreen();
+    if (libraryLockScreen) {
+      libraryLockScreen.classList.add("unlocked");
+      libraryLockScreen.style.display = "none";
+    }
   } else {
-    libraryLockScreen.classList.remove("unlocked");
+    hideSiteUnavailableScreen();
+    if (libraryLockScreen) {
+      libraryLockScreen.style.display = "flex";
+      libraryLockScreen.classList.remove("unlocked");
+    }
     resetPinBuffer();
     setTimeout(() => {
       if (pinKeyboardInput) pinKeyboardInput.focus();
@@ -3548,6 +3629,10 @@ function resetPinBuffer() {
   enteredPinBuffer = "";
   updatePinDots();
   if (pinKeyboardInput) pinKeyboardInput.value = "";
+  if (lockMessage) {
+    lockMessage.classList.remove("error");
+    lockMessage.innerHTML = `<span class="material-symbols-rounded" style="font-size: 15px;">lock</span> <span>Enter 4-digit security PIN</span>`;
+  }
 }
 
 function updatePinDots() {
@@ -3561,30 +3646,25 @@ function updatePinDots() {
 }
 
 function verifyPin() {
-  const effectivePin = libraryPin || "1234";
-  if (enteredPinBuffer === effectivePin || enteredPinBuffer === "1234") {
-    // Successfully Unlocked!
+  const effectivePin = String(libraryPin || "1234").trim();
+  const entered = String(enteredPinBuffer).trim();
+
+  if (entered === effectivePin) {
+    // Successfully Unlocked! ("sitileek keeranam")
     isUnlocked = true;
     sessionStorage.setItem("gpaylib_unlocked", "true");
-    if (libraryLockScreen) libraryLockScreen.classList.add("unlocked");
+    hideSiteUnavailableScreen();
+    if (libraryLockScreen) {
+      libraryLockScreen.classList.add("unlocked");
+      setTimeout(() => {
+        libraryLockScreen.style.display = "none";
+      }, 350);
+    }
     resetPinBuffer();
     showToast("Library Unlocked • Welcome!", "lock_open");
   } else {
-    // Incorrect PIN
-    if (pinDotsContainer) pinDotsContainer.classList.add("shake");
-    if (lockMessage) {
-      lockMessage.classList.add("error");
-      lockMessage.innerHTML = `<span class="material-symbols-rounded" style="font-size: 15px;">error</span> Incorrect PIN. Try again.`;
-    }
-
-    setTimeout(() => {
-      if (pinDotsContainer) pinDotsContainer.classList.remove("shake");
-      resetPinBuffer();
-      if (lockMessage) {
-        lockMessage.classList.remove("error");
-        lockMessage.innerHTML = `<span class="material-symbols-rounded" style="font-size: 15px;">info</span> Default PIN is <strong>1234</strong>`;
-      }
-    }, 600);
+    // Incorrect PIN -> Camouflage as "This site is not available"
+    showSiteUnavailableScreen();
   }
 }
 
@@ -3598,7 +3678,9 @@ function lockLibraryNow() {
   closePrintModal();
   closeCategoryModal();
   closeStatsModal();
+  hideSiteUnavailableScreen();
   if (libraryLockScreen) {
+    libraryLockScreen.style.display = "flex";
     libraryLockScreen.classList.remove("unlocked");
   }
   showToast("Library Locked", "lock");
