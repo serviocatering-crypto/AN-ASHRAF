@@ -12,7 +12,7 @@
     "status": "Available",
     "shelfLocation": "",
     "addedDate": "2026-10-21",
-    "coverPhoto": ""
+    "coverPhoto": "/uploads/muslim_cover.png"
   },
   {
     "id": "book-1792604153303",
@@ -27,7 +27,7 @@
     "status": "Available",
     "shelfLocation": "",
     "addedDate": "2026-10-21",
-    "coverPhoto": ""
+    "coverPhoto": "/uploads/bukhari_cover.png"
   },
   {
     "id": "book-1792604300001",
@@ -42,7 +42,7 @@
     "status": "Available",
     "shelfLocation": "",
     "addedDate": "2026-10-21",
-    "coverPhoto": ""
+    "coverPhoto": "/uploads/nasai_cover.png"
   },
   {
     "id": "book-1792604300002",
@@ -57,7 +57,7 @@
     "status": "Available",
     "shelfLocation": "",
     "addedDate": "2026-10-21",
-    "coverPhoto": ""
+    "coverPhoto": "/uploads/abudawud_cover.png"
   },
   {
     "id": "book-1792604300003",
@@ -72,7 +72,7 @@
     "status": "Available",
     "shelfLocation": "",
     "addedDate": "2026-10-21",
-    "coverPhoto": ""
+    "coverPhoto": "/uploads/cover_book-1792604300003_1792869500163.jpg"
   },
   {
     "id": "book-1792604300004",
@@ -87,6 +87,6 @@
     "status": "Available",
     "shelfLocation": "",
     "addedDate": "2026-10-21",
-    "coverPhoto": ""
+    "coverPhoto": "/uploads/ibnmajah_cover.png"
   }
 ]

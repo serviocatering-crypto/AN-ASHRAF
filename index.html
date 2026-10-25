@@ -16,6 +16,8 @@
   <!-- Barcode & QR Code generators for crisp library labels -->
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -27,8 +29,8 @@
     <header class="gpay-header">
       <div class="header-top">
         <div class="brand-badge">
-          <div class="brand-logo-circle">
-            <span class="material-symbols-rounded">menu_book</span>
+          <div class="brand-logo-circle" style="overflow: hidden; padding: 2px; background: #ffffff;">
+            <img src="logo.png" alt="AN Library" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;">
           </div>
           <div class="brand-text">
             <div class="brand-sub-row">
@@ -111,15 +113,7 @@
             <span class="action-label">Backup Data</span>
           </button>
 
-          <!-- 4. Check Available Books (Key Feature) -->
-          <button class="action-item" id="filterAvailableBtn">
-            <div class="action-icon-circle teal">
-              <span class="material-symbols-rounded">check_circle</span>
-            </div>
-            <span class="action-label">Available Only</span>
-          </button>
-
-          <!-- 5. Add Category -->
+          <!-- 4. Add Category -->
           <button class="action-item" id="openAddCategoryBtn">
             <div class="action-icon-circle purple">
               <span class="material-symbols-rounded">category</span>
@@ -142,11 +136,19 @@
             </div>
             <span class="action-label">Library Insights</span>
           </button>
+
+          <!-- 8. Security & PIN Settings -->
+          <button class="action-item" id="quickSecurityBtn" title="Library Security & PIN Settings">
+            <div class="action-icon-circle blue">
+              <span class="material-symbols-rounded">shield</span>
+            </div>
+            <span class="action-label">Security PIN</span>
+          </button>
         </div>
       </section>
 
-      <!-- Availability Quick Toggle Banner (Google Pay Prominent Card) -->
-      <section class="gpay-card promo-banner">
+      <!-- Availability Quick Toggle Banner (Hidden per user preference) -->
+      <section class="gpay-card promo-banner" style="display: none;">
         <div class="promo-content">
           <div class="promo-text">
             <div class="availability-badge-live">
@@ -166,8 +168,12 @@
         </div>
       </section>
 
-      <!-- Category Chips Scroll (Google Pay Contact / Tag Style) -->
-      <section class="category-chips-section">
+      <!-- Category Chips Scroll (Prominent Quick Position) -->
+      <section class="category-chips-section" style="margin-top: 10px; margin-bottom: 10px;">
+        <div style="font-size: 13.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+          <span class="material-symbols-rounded" style="color: var(--gpay-blue); font-size: 20px;">category</span>
+          <span>Book Categories / വിഭാഗങ്ങൾ</span>
+        </div>
         <div class="chips-scroll-container" id="categoryChipsContainer">
           <!-- Dynamic category chips will be injected here -->
         </div>
@@ -248,9 +254,9 @@
         <span class="material-symbols-rounded">forum</span>
         <span class="tab-label">Chat</span>
       </button>
-      <button class="nav-tab" data-nav="available">
-        <span class="material-symbols-rounded">inventory_2</span>
-        <span class="tab-label">Available</span>
+      <button class="nav-tab" data-nav="categories" id="navCategoriesTab">
+        <span class="material-symbols-rounded">category</span>
+        <span class="tab-label">Categories</span>
       </button>
       <button class="nav-tab" data-nav="backup" id="navBackupTab">
         <span class="material-symbols-rounded">cloud_sync</span>
@@ -1046,6 +1052,8 @@
       </div>
     </div>
   </div>
+
+
 
   <!-- MODAL: INTERACTIVE POPUP DIALOG (Confirm / Alert / Prompt) -->
   <div class="modal-backdrop" id="customPopupBackdrop">

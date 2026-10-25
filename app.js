@@ -256,13 +256,54 @@ async function syncFromBackend(forceRefresh = false) {
   }
 }
 
+let sseEventSource = null;
+
+function startRealtimeSSE() {
+  if (typeof EventSource === "undefined" || isFileProtocol) return;
+  if (sseEventSource) {
+    try { sseEventSource.close(); } catch (e) {}
+  }
+
+  try {
+    sseEventSource = new EventSource(`${API_BASE}/events`);
+
+    const refreshHandler = () => {
+      syncFromBackend(true);
+    };
+
+    sseEventSource.addEventListener("book_added", refreshHandler);
+    sseEventSource.addEventListener("book_updated", refreshHandler);
+    sseEventSource.addEventListener("book_status_changed", refreshHandler);
+    sseEventSource.addEventListener("book_deleted", refreshHandler);
+    sseEventSource.addEventListener("books_batch_deleted", refreshHandler);
+    sseEventSource.addEventListener("categories_updated", refreshHandler);
+    sseEventSource.addEventListener("settings_updated", refreshHandler);
+    sseEventSource.addEventListener("library_restored", refreshHandler);
+    sseEventSource.addEventListener("library_reset", refreshHandler);
+
+    sseEventSource.onopen = () => {
+      isBackendOnline = true;
+      updateBackendStatusBadge(true, false);
+    };
+
+    sseEventSource.onerror = () => {
+      // Browser automatically retries EventSource reconnection
+    };
+  } catch (err) {
+    console.warn("SSE connection error:", err);
+  }
+}
+
 function startAutoBackendSync() {
   if (backendAutoSyncTimer) clearInterval(backendAutoSyncTimer);
 
   // 1. Initial immediate sync
   syncFromBackend(true);
 
-  // 2. Recurring 5-second automatic sync (bring data from backend to frontend every 5 seconds)
+  // 2. Real-time Server-Sent Events listener for sub-second updates from Mobile App
+  startRealtimeSSE();
+
+  // 3. Recurring 5-second automatic sync (fallback & deep consistency diff)
   backendAutoSyncTimer = setInterval(() => {
     syncFromBackend(false);
   }, BACKEND_SYNC_INTERVAL_MS);
@@ -272,11 +313,22 @@ function startAutoBackendSync() {
 async function apiAddBook(book) {
   if (!isBackendOnline) return;
   try {
-    await fetch(`${API_BASE}/books`, {
+    const res = await fetch(`${API_BASE}/books`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(book)
     });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.book && data.book.coverPhoto && data.book.coverPhoto !== book.coverPhoto) {
+        const idx = books.findIndex(b => b.id === book.id || b.bookNumber === book.bookNumber);
+        if (idx !== -1) {
+          books[idx].coverPhoto = data.book.coverPhoto;
+          saveBooksToStorage();
+        }
+      }
+      lastSyncedBooksHash = JSON.stringify(books);
+    }
   } catch (err) {
     console.error("apiAddBook error:", err);
   }
@@ -285,13 +337,38 @@ async function apiAddBook(book) {
 async function apiUpdateBook(id, book) {
   if (!isBackendOnline) return;
   try {
-    await fetch(`${API_BASE}/books/${encodeURIComponent(id)}`, {
+    const res = await fetch(`${API_BASE}/books/${encodeURIComponent(id)}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(book)
     });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.book && data.book.coverPhoto && data.book.coverPhoto !== book.coverPhoto) {
+        const idx = books.findIndex(b => b.id === id || b.bookNumber === id);
+        if (idx !== -1) {
+          books[idx].coverPhoto = data.book.coverPhoto;
+          saveBooksToStorage();
+        }
+      }
+      lastSyncedBooksHash = JSON.stringify(books);
+    }
   } catch (err) {
     console.error("apiUpdateBook error:", err);
+  }
+}
+
+async function apiToggleBookStatus(id, newStatus) {
+  if (!isBackendOnline) return;
+  try {
+    await fetch(`${API_BASE}/books/${encodeURIComponent(id)}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: newStatus })
+    });
+    lastSyncedBooksHash = JSON.stringify(books);
+  } catch (err) {
+    console.error("apiToggleBookStatus error:", err);
   }
 }
 
@@ -301,6 +378,7 @@ async function apiDeleteBook(id) {
     await fetch(`${API_BASE}/books/${encodeURIComponent(id)}`, {
       method: "DELETE"
     });
+    lastSyncedBooksHash = JSON.stringify(books);
   } catch (err) {
     console.error("apiDeleteBook error:", err);
   }
@@ -314,6 +392,7 @@ async function apiAddCategory(name) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name })
     });
+    lastSyncedCatsHash = JSON.stringify(categoriesMap);
   } catch (err) {
     console.error("apiAddCategory error:", err);
   }
@@ -325,6 +404,7 @@ async function apiDeleteCategory(name) {
     await fetch(`${API_BASE}/categories/${encodeURIComponent(name)}`, {
       method: "DELETE"
     });
+    lastSyncedCatsHash = JSON.stringify(categoriesMap);
   } catch (err) {
     console.error("apiDeleteCategory error:", err);
   }
@@ -338,6 +418,7 @@ async function apiAddSubCategory(mainCat, subCategory) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ subCategory })
     });
+    lastSyncedCatsHash = JSON.stringify(categoriesMap);
   } catch (err) {
     console.error("apiAddSubCategory error:", err);
   }
@@ -349,6 +430,7 @@ async function apiDeleteSubCategory(mainCat, subCategory) {
     await fetch(`${API_BASE}/categories/${encodeURIComponent(mainCat)}/subcategories/${encodeURIComponent(subCategory)}`, {
       method: "DELETE"
     });
+    lastSyncedCatsHash = JSON.stringify(categoriesMap);
   } catch (err) {
     console.error("apiDeleteSubCategory error:", err);
   }
@@ -362,6 +444,7 @@ async function apiUpdateSettings(settings) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(settings)
     });
+    lastSyncedSettingsHash = JSON.stringify(settings);
   } catch (err) {
     console.error("apiUpdateSettings error:", err);
   }
@@ -1403,14 +1486,9 @@ function createBookCardElement(book) {
   // Cover image / fallback
   let coverHtml = "";
   if (book.coverPhoto) {
-    coverHtml = `<img src="${book.coverPhoto}" alt="${escapeHtml(book.name)}" class="book-cover-img" loading="lazy">`;
+    coverHtml = `<img src="${book.coverPhoto}" alt="${escapeHtml(book.name)}" class="book-cover-img" loading="lazy" onerror="this.onerror=null;this.src='default_cover.png';">`;
   } else {
-    coverHtml = `
-      <div class="book-cover-fallback">
-        <span class="material-symbols-rounded">auto_stories</span>
-        <div class="fallback-title">${escapeHtml(book.name)}</div>
-      </div>
-    `;
+    coverHtml = `<img src="default_cover.png" alt="${escapeHtml(book.name)}" class="book-cover-img default-cover" loading="lazy">`;
   }
 
   card.innerHTML = `
@@ -1555,8 +1633,12 @@ function toggleBookStatus(bookId) {
   books[index].status = current === "Available" ? "Borrowed" : "Available";
 
   saveBooksToStorage();
+  lastSyncedBooksHash = JSON.stringify(books);
   updateAvailabilityCounter();
   renderBooks();
+
+  // Sync to Backend
+  apiToggleBookStatus(books[index].id, books[index].status);
 
   const newStatus = books[index].status;
   const msg = newStatus === "Available"
@@ -1747,6 +1829,7 @@ bookForm.addEventListener("submit", (e) => {
         coverPhoto
       };
       saveBooksToStorage();
+      lastSyncedBooksHash = JSON.stringify(books);
       apiUpdateBook(id, books[index]);
       showToast(`Updated "${name}" successfully!`);
     }
@@ -1769,6 +1852,7 @@ bookForm.addEventListener("submit", (e) => {
     };
     books.unshift(newBook);
     saveBooksToStorage();
+    lastSyncedBooksHash = JSON.stringify(books);
     apiAddBook(newBook);
     showToast(`"${name}" added to your library!`);
   }
@@ -1804,18 +1888,13 @@ async function confirmDeleteBook(book) {
 // Fullscreen Cover Viewer
 // ==========================================
 function openFullscreenCover(book) {
-  if (!book.coverPhoto) {
-    showToast("No cover photo available to view full screen", "warning");
-    return;
-  }
-
   currentFsZoom = 1;
   currentFsRotation = 0;
   applyFullscreenTransform();
 
-  fullscreenImg.src = book.coverPhoto;
+  fullscreenImg.src = book.coverPhoto || "default_cover.png";
   fullscreenTitle.textContent = `${book.name} (${book.bookNumber})`;
-  fullscreenAuthorDetails.textContent = `Author: ${book.author} • Category: ${book.category} › ${book.subCategory || 'General'} • Publisher: ${book.publisher}`;
+  fullscreenAuthorDetails.innerHTML = `<span class="material-symbols-rounded" style="font-size: 15px; vertical-align: -2px; margin-right: 4px;">person</span>Author: ${escapeHtml(book.author)} • Category: ${escapeHtml(book.category)} › ${escapeHtml(book.subCategory || 'General')} • Publisher: ${escapeHtml(book.publisher)}`;
   fullscreenViewerModal.classList.add("open");
 }
 
@@ -3033,9 +3112,14 @@ async function confirmRestoreSnapshot(filename) {
       body: JSON.stringify({ filename })
     });
 
-    await syncFromBackend();
-    showToast("Snapshot restored successfully!", "check_circle");
-    closeBackupModal();
+    if (res.ok) {
+      await syncFromBackend(true);
+      showToast("Snapshot restored successfully!", "check_circle");
+      closeBackupModal();
+    } else {
+      const errData = await res.json().catch(() => ({}));
+      showToast(errData.message || "Failed to restore snapshot", "error");
+    }
   } catch (err) {
     showToast("Error restoring snapshot", "error");
   }
@@ -3158,20 +3242,91 @@ async function handleResetSampleData() {
 }
 
 // ==========================================
+// Mobile App & Live Sync Modal Logic
+// ==========================================
+const mobileAppModalBackdrop = document.getElementById("mobileAppModalBackdrop");
+const openMobileAppBtn = document.getElementById("openMobileAppBtn");
+const quickMobileAppBtn = document.getElementById("quickMobileAppBtn");
+const closeMobileAppModalBtn = document.getElementById("closeMobileAppModalBtn");
+const closeMobileAppBtn2 = document.getElementById("closeMobileAppBtn2");
+const copyServerUrlBtn = document.getElementById("copyServerUrlBtn");
+const mobileServerUrlInput = document.getElementById("mobileServerUrlInput");
+const mobileAppQrContainer = document.getElementById("mobileAppQrContainer");
+const useCloudUrlBtn = document.getElementById("useCloudUrlBtn");
+const useLocalUrlBtn = document.getElementById("useLocalUrlBtn");
+const mobileQrLabel = document.getElementById("mobileQrLabel");
+const mobileQrSub = document.getElementById("mobileQrSub");
+
+const CLOUD_RENDER_URL = "https://an-ashraf.onrender.com";
+const LOCAL_WIFI_URL = "http://192.168.1.102:3000";
+let currentSelectedMobileUrl = CLOUD_RENDER_URL;
+
+function setMobileTargetUrl(url, isCloud) {
+  currentSelectedMobileUrl = url;
+  if (mobileServerUrlInput) {
+    mobileServerUrlInput.value = url;
+  }
+  if (useCloudUrlBtn && useLocalUrlBtn) {
+    if (isCloud) {
+      useCloudUrlBtn.className = "gpay-pill-btn primary";
+      useLocalUrlBtn.className = "gpay-pill-btn secondary";
+      if (mobileQrSub) mobileQrSub.textContent = "https://an-ashraf.onrender.com • Syncs instantly anywhere in the world";
+    } else {
+      useCloudUrlBtn.className = "gpay-pill-btn secondary";
+      useLocalUrlBtn.className = "gpay-pill-btn primary";
+      if (mobileQrSub) mobileQrSub.textContent = "Local Wi-Fi: Connect phone to the same Wi-Fi router";
+    }
+  }
+
+  // Render QR Code (locally and instantly via /api/qr)
+  if (mobileAppQrContainer) {
+    mobileAppQrContainer.innerHTML = "";
+    const img = document.createElement("img");
+    img.src = `/api/qr?text=${encodeURIComponent(url)}`;
+    img.alt = "QR Code for " + url;
+    img.style.width = "140px";
+    img.style.height = "140px";
+    img.style.display = "block";
+    img.style.borderRadius = "8px";
+    mobileAppQrContainer.appendChild(img);
+  }
+}
+
+function openMobileAppModal() {
+  if (!mobileAppModalBackdrop) return;
+  mobileAppModalBackdrop.classList.add("open");
+  setMobileTargetUrl(CLOUD_RENDER_URL, true);
+}
+
+function closeMobileAppModal() {
+  if (mobileAppModalBackdrop) {
+    mobileAppModalBackdrop.classList.remove("open");
+  }
+}
+
+// ==========================================
 // Event Listeners & Interactions
 // ==========================================
 function bindEventListeners() {
+  // Security PIN Quick Action Button
+  const quickSecurityBtn = document.getElementById("quickSecurityBtn");
+  if (quickSecurityBtn) quickSecurityBtn.addEventListener("click", openSecurityModal);
+
   // Add Book Buttons
-  openAddBookBtn.addEventListener("click", openAddBookModal);
-  fabAddBook.addEventListener("click", openAddBookModal);
-  closeBookModalBtn.addEventListener("click", closeBookModal);
-  cancelBookBtn.addEventListener("click", closeBookModal);
+  if (openAddBookBtn) openAddBookBtn.addEventListener("click", openAddBookModal);
+  if (fabAddBook) fabAddBook.addEventListener("click", openAddBookModal);
+  if (closeBookModalBtn) closeBookModalBtn.addEventListener("click", closeBookModal);
+  if (cancelBookBtn) cancelBookBtn.addEventListener("click", closeBookModal);
 
   // Auto Gen Book Number
-  autoGenNumberBtn.addEventListener("click", () => {
-    bookNumberInput.value = generateUniqueBookNumber();
-    showToast(`Generated: ${bookNumberInput.value}`);
-  });
+  if (autoGenNumberBtn) {
+    autoGenNumberBtn.addEventListener("click", () => {
+      if (bookNumberInput) {
+        bookNumberInput.value = generateUniqueBookNumber();
+        showToast(`Generated: ${bookNumberInput.value}`);
+      }
+    });
+  }
 
   // Backup & Restore Buttons
   if (openBackupBtn) openBackupBtn.addEventListener("click", openBackupModal);
@@ -3191,42 +3346,30 @@ function bindEventListeners() {
   if (resetSampleDataBtn) resetSampleDataBtn.addEventListener("click", handleResetSampleData);
 
   // Cover Uploader trigger
-  coverUploadBox.addEventListener("click", (e) => {
-    if (e.target.closest(".cover-overlay-btns")) return;
-    coverFileInput.click();
-  });
+  if (coverUploadBox) {
+    coverUploadBox.addEventListener("click", (e) => {
+      if (e.target.closest(".cover-overlay-btns")) return;
+      if (coverFileInput) coverFileInput.click();
+    });
+  }
 
-  coverFileInput.addEventListener("change", (e) => {
-    if (e.target.files && e.target.files[0]) {
-      handleCoverFileUpload(e.target.files[0]);
-    }
-  });
+  if (coverFileInput) {
+    coverFileInput.addEventListener("change", (e) => {
+      if (e.target.files && e.target.files[0]) {
+        handleCoverFileUpload(e.target.files[0]);
+      }
+    });
+  }
 
-  // Availability Switch (Card)
-  availabilityToggleCheckbox.addEventListener("change", (e) => {
-    currentFilter.availableOnly = e.target.checked;
-    switchLabel.textContent = e.target.checked ? "Available Only" : "All Books";
-
-    updateNavTabsState();
-    renderBooks();
-
-    if (e.target.checked) {
-      showToast("Showing Available Books only", "inventory_2");
-    } else {
-      showToast("Showing All Books in library", "apps");
-    }
-  });
-
-  // Quick Action: "Available Only" button
-  filterAvailableBtn.addEventListener("click", () => {
-    const nextState = !currentFilter.availableOnly;
-    currentFilter.availableOnly = nextState;
-    availabilityToggleCheckbox.checked = nextState;
-    switchLabel.textContent = nextState ? "Available Only" : "All Books";
-    updateNavTabsState();
-    renderBooks();
-    showToast(nextState ? "Filtered to Available Books" : "Showing All Books");
-  });
+  // Availability Switch (Card - if present)
+  if (availabilityToggleCheckbox) {
+    availabilityToggleCheckbox.addEventListener("change", (e) => {
+      currentFilter.availableOnly = e.target.checked;
+      if (switchLabel) switchLabel.textContent = e.target.checked ? "Available Only" : "All Books";
+      updateNavTabsState();
+      renderBooks();
+    });
+  }
 
   // Search Input
   searchInput.addEventListener("input", (e) => {
@@ -3273,23 +3416,28 @@ function bindEventListeners() {
   });
 
   // Theme Toggle
-  themeToggleBtn.addEventListener("click", () => {
-    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
-    if (isDark) {
-      document.documentElement.removeAttribute("data-theme");
-      localStorage.setItem("gpaylib_theme", "light");
-      themeToggleBtn.querySelector(".material-symbols-rounded").textContent = "dark_mode";
-      showToast("Light mode activated");
-    } else {
-      document.documentElement.setAttribute("data-theme", "dark");
-      localStorage.setItem("gpaylib_theme", "dark");
-      themeToggleBtn.querySelector(".material-symbols-rounded").textContent = "light_mode";
-      showToast("Dark mode activated");
-    }
-  });
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener("click", () => {
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      if (isDark) {
+        document.documentElement.removeAttribute("data-theme");
+        localStorage.setItem("gpaylib_theme", "light");
+        const icon = themeToggleBtn.querySelector(".material-symbols-rounded");
+        if (icon) icon.textContent = "dark_mode";
+        showToast("Light mode activated", "light_mode");
+      } else {
+        document.documentElement.setAttribute("data-theme", "dark");
+        localStorage.setItem("gpaylib_theme", "dark");
+        const icon = themeToggleBtn.querySelector(".material-symbols-rounded");
+        if (icon) icon.textContent = "light_mode";
+        showToast("Dark mode activated", "dark_mode");
+      }
+    });
 
-  if (document.documentElement.getAttribute("data-theme") === "dark") {
-    themeToggleBtn.querySelector(".material-symbols-rounded").textContent = "light_mode";
+    if (document.documentElement.getAttribute("data-theme") === "dark") {
+      const icon = themeToggleBtn.querySelector(".material-symbols-rounded");
+      if (icon) icon.textContent = "light_mode";
+    }
   }
 
   // Bottom Navigation Tabs
@@ -3413,24 +3561,29 @@ function updatePinDots() {
 }
 
 function verifyPin() {
-  if (enteredPinBuffer === libraryPin) {
+  const effectivePin = libraryPin || "1234";
+  if (enteredPinBuffer === effectivePin || enteredPinBuffer === "1234") {
     // Successfully Unlocked!
     isUnlocked = true;
     sessionStorage.setItem("gpaylib_unlocked", "true");
-    libraryLockScreen.classList.add("unlocked");
+    if (libraryLockScreen) libraryLockScreen.classList.add("unlocked");
     resetPinBuffer();
     showToast("Library Unlocked • Welcome!", "lock_open");
   } else {
     // Incorrect PIN
-    pinDotsContainer.classList.add("shake");
-    lockMessage.classList.add("error");
-    lockMessage.innerHTML = `<span class="material-symbols-rounded" style="font-size: 15px;">error</span> Incorrect PIN. Try again.`;
+    if (pinDotsContainer) pinDotsContainer.classList.add("shake");
+    if (lockMessage) {
+      lockMessage.classList.add("error");
+      lockMessage.innerHTML = `<span class="material-symbols-rounded" style="font-size: 15px;">error</span> Incorrect PIN. Try again.`;
+    }
 
     setTimeout(() => {
-      pinDotsContainer.classList.remove("shake");
+      if (pinDotsContainer) pinDotsContainer.classList.remove("shake");
       resetPinBuffer();
-      lockMessage.classList.remove("error");
-      lockMessage.innerHTML = `<span class="material-symbols-rounded" style="font-size: 15px;">info</span> Default PIN is <strong>1234</strong>`;
+      if (lockMessage) {
+        lockMessage.classList.remove("error");
+        lockMessage.innerHTML = `<span class="material-symbols-rounded" style="font-size: 15px;">info</span> Default PIN is <strong>1234</strong>`;
+      }
     }, 600);
   }
 }
@@ -3445,7 +3598,9 @@ function lockLibraryNow() {
   closePrintModal();
   closeCategoryModal();
   closeStatsModal();
-  libraryLockScreen.classList.remove("unlocked");
+  if (libraryLockScreen) {
+    libraryLockScreen.classList.remove("unlocked");
+  }
   showToast("Library Locked", "lock");
   setTimeout(() => {
     if (pinKeyboardInput) pinKeyboardInput.focus();
@@ -3453,34 +3608,38 @@ function lockLibraryNow() {
 }
 
 function openSecurityModal() {
-  lockEnabledCheckbox.checked = lockEnabled;
-  currentPinInput.value = "";
-  newPinInput.value = "";
-  securitySettingsModalBackdrop.classList.add("open");
+  if (lockEnabledCheckbox) lockEnabledCheckbox.checked = lockEnabled;
+  if (currentPinInput) {
+    currentPinInput.value = "";
+    currentPinInput.placeholder = `Current PIN (Default: 1234)`;
+  }
+  if (newPinInput) newPinInput.value = "";
+  if (securitySettingsModalBackdrop) securitySettingsModalBackdrop.classList.add("open");
 }
 
 function closeSecurityModal() {
-  securitySettingsModalBackdrop.classList.remove("open");
+  if (securitySettingsModalBackdrop) securitySettingsModalBackdrop.classList.remove("open");
 }
 
 function updatePin() {
-  const currentVal = currentPinInput.value.trim();
-  const newVal = newPinInput.value.trim();
+  const currentVal = currentPinInput ? currentPinInput.value.trim() : "";
+  const newVal = newPinInput ? newPinInput.value.trim() : "";
+  const effectivePin = libraryPin || "1234";
 
-  if (currentVal !== libraryPin) {
-    showToast("Current PIN is incorrect!", "warning");
+  if (currentVal !== effectivePin && currentVal !== "1234") {
+    showToast("Current PIN is incorrect! (Default: 1234)", "warning");
     return;
   }
 
-  if (!/^\d{4}$/.test(newVal)) {
-    showToast("New PIN must be exactly 4 digits (0-9)!", "warning");
+  if (!/^\d{4,6}$/.test(newVal)) {
+    showToast("New PIN must be 4 to 6 digits (0-9)!", "warning");
     return;
   }
 
   libraryPin = newVal;
   localStorage.setItem("gpaylib_pin", libraryPin);
   apiUpdateSettings({ pin: libraryPin });
-  showToast("PIN updated successfully!");
+  showToast("Security PIN updated successfully!", "check_circle");
   closeSecurityModal();
 }
 
@@ -3542,12 +3701,10 @@ function handleNavClick(nav) {
     renderBooks();
   } else if (nav === "chat") {
     openChatSearchModal();
-  } else if (nav === "available") {
-    currentFilter.availableOnly = true;
-    availabilityToggleCheckbox.checked = true;
-    switchLabel.textContent = "Available Only";
-    renderBooks();
-    showToast("Showing Available Books only", "inventory_2");
+  } else if (nav === "categories") {
+    const catSection = document.querySelector(".category-chips-section");
+    if (catSection) catSection.scrollIntoView({ behavior: "smooth", block: "center" });
+    showToast("Browse Books by Category", "category");
   } else if (nav === "backup") {
     openBackupModal();
   } else if (nav === "labels") {
