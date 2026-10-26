@@ -8,3 +8,7 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 20.18.0
+      - key: PUBLIC_URL
+        value: https://an-ashraf.onrender.com
+      - key: MONGODB_URI
+        sync: false # Set in Render Dashboard -> Environment for MongoDB Atlas 24/7 permanent cloud persistence

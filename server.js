@@ -3,6 +3,7 @@ const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
+const cloudStorage = require("./cloudStorage.js");
 let QRCodeLib = null;
 try {
   QRCodeLib = require("qrcode");
@@ -40,7 +41,25 @@ app.use((req, res, next) => {
   next();
 });
 
-// Static Asset Serving
+// Static Asset Serving with Anti-Sleep / Auto-Reconstruction Shield
+app.get("/uploads/:filename", (req, res, next) => {
+  const safeFilename = path.basename(req.params.filename);
+  const directPath = path.join(UPLOADS_DIR, safeFilename);
+  if (fs.existsSync(directPath)) {
+    return res.sendFile(directPath);
+  }
+  // Auto-reconstruct missing cover from book data if wiped after container sleep
+  const books = readJson(BOOKS_FILE, []);
+  const reconstructedPath = cloudStorage.reconstructMissingUpload(safeFilename, books);
+  if (reconstructedPath && fs.existsSync(reconstructedPath)) {
+    return res.sendFile(reconstructedPath);
+  }
+  const defaultCover = path.join(__dirname, "default_cover.png");
+  if (fs.existsSync(defaultCover)) {
+    return res.sendFile(defaultCover);
+  }
+  res.status(404).send("File not found");
+});
 app.use("/uploads", express.static(UPLOADS_DIR));
 
 // Direct Download for Compiled Android Mobile App (APK)
@@ -101,6 +120,8 @@ app.use((req, res, next) => {
 // Default Fallback Data & Seeders
 // ==========================================
 const DEFAULT_CATEGORIES = {
+  "KITHAB": ["HADHEES"],
+  "MALAYALAM": ["General"],
   "Science": ["Biology", "Space & Astronomy", "Human Anatomy", "Physics", "Chemistry"],
   "Technology": ["Software Engineering", "Artificial Intelligence", "Web Development", "Mobile Apps", "Cybersecurity"],
   "Self-Help": ["Habits & Productivity", "Psychology & Mindset", "Mindfulness", "Personal Finance"],
@@ -168,6 +189,7 @@ function readJson(filePath, defaultValue) {
 }
 
 function writeJson(filePath, data) {
+  let writeOk = false;
   const tempPath = `${filePath}.${Date.now()}.${crypto.randomBytes(4).toString("hex")}.tmp`;
   try {
     const parent = path.dirname(filePath);
@@ -177,7 +199,7 @@ function writeJson(filePath, data) {
     const jsonString = JSON.stringify(data, null, 2);
     fs.writeFileSync(tempPath, jsonString, "utf-8");
     fs.renameSync(tempPath, filePath);
-    return true;
+    writeOk = true;
   } catch (err) {
     console.error(`[STORAGE] Error atomic writing ${filePath}:`, err.message);
     try {
@@ -186,12 +208,25 @@ function writeJson(filePath, data) {
     // Fallback direct write if atomic rename is locked on Windows
     try {
       fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
-      return true;
+      writeOk = true;
     } catch (innerErr) {
       console.error(`[STORAGE] Direct fallback write failed for ${filePath}:`, innerErr.message);
-      return false;
+      writeOk = false;
     }
   }
+
+  // Persistent Cloud Database Sync (MongoDB Atlas)
+  if (writeOk) {
+    if (filePath === BOOKS_FILE && Array.isArray(data)) {
+      cloudStorage.persistBooks(data);
+    } else if (filePath === CATEGORIES_FILE && typeof data === "object") {
+      cloudStorage.persistCategories(data);
+    } else if (filePath === SETTINGS_FILE && typeof data === "object") {
+      cloudStorage.persistSettings(data);
+    }
+  }
+
+  return writeOk;
 }
 
 // ==========================================
@@ -200,17 +235,17 @@ function writeJson(filePath, data) {
 // ==========================================
 function processCoverPhoto(bookId, coverPhoto) {
   if (!coverPhoto || typeof coverPhoto !== "string") {
-    return "";
+    return { url: "", data: "" };
   }
 
   // Preserve lightweight SVG data URIs
   if (coverPhoto.startsWith("data:image/svg+xml")) {
-    return coverPhoto;
+    return { url: coverPhoto, data: coverPhoto };
   }
 
   // Preserve existing hosted URLs or local /uploads paths
   if (coverPhoto.startsWith("http://") || coverPhoto.startsWith("https://") || coverPhoto.startsWith("/uploads/")) {
-    return coverPhoto;
+    return { url: coverPhoto, data: "" };
   }
 
   // Detect base64 raster image: data:image/(png|jpeg|jpg|webp);base64,...
@@ -226,14 +261,14 @@ function processCoverPhoto(bookId, coverPhoto) {
       const filePath = path.join(UPLOADS_DIR, filename);
 
       fs.writeFileSync(filePath, buffer);
-      return `/uploads/${filename}`;
+      return { url: `/uploads/${filename}`, data: coverPhoto };
     } catch (err) {
       console.error("[UPLOADS] Failed to convert base64 image:", err.message);
-      return coverPhoto; // fallback to raw string if write fails
+      return { url: coverPhoto, data: coverPhoto };
     }
   }
 
-  return coverPhoto;
+  return { url: coverPhoto, data: "" };
 }
 
 // Delete uploaded image file from disk if it was stored locally
@@ -276,6 +311,20 @@ function ensureCategoryExists(category, subCategory) {
 readJson(BOOKS_FILE, []);
 readJson(CATEGORIES_FILE, DEFAULT_CATEGORIES);
 readJson(SETTINGS_FILE, DEFAULT_SETTINGS);
+
+// Initialize Cloud Persistence & Anti-Sleep Heartbeat Engine
+cloudStorage.init({
+  booksFile: BOOKS_FILE,
+  categoriesFile: CATEGORIES_FILE,
+  settingsFile: SETTINGS_FILE,
+  uploadsDir: UPLOADS_DIR,
+  defaultCategories: DEFAULT_CATEGORIES,
+  defaultSettings: DEFAULT_SETTINGS,
+  onDataUpdated: (type, data) => {
+    if (type === "books") notifyClients("books_synced", { books: data });
+    if (type === "categories") notifyClients("categories_updated", { categories: data });
+  }
+});
 
 // ==========================================
 // Real-Time Server-Sent Events (SSE) Stream
@@ -321,8 +370,45 @@ setInterval(() => {
 }, 20000);
 
 // ==========================================
-// 1. Health, Status & System Diagnostics
+// 1. Health, Status, Anti-Sleep Ping & Cloud Diagnostics
 // ==========================================
+app.get(["/api/ping", "/api/health"], (req, res) => {
+  res.json({
+    status: "ok",
+    awake: true,
+    uptimeSeconds: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+    ...cloudStorage.getStatus()
+  });
+});
+
+app.get("/api/cloud-status", (req, res) => {
+  res.json(cloudStorage.getStatus());
+});
+
+app.post("/api/cloud-config", async (req, res) => {
+  const { mongodbUri } = req.body;
+  if (!mongodbUri || typeof mongodbUri !== "string" || !mongodbUri.trim()) {
+    return res.status(400).json({ success: false, message: "Valid MongoDB connection URI required." });
+  }
+  try {
+    await cloudStorage.connectMongo(mongodbUri.trim());
+    const settings = readJson(SETTINGS_FILE, DEFAULT_SETTINGS);
+    settings.mongodbUri = mongodbUri.trim();
+    writeJson(SETTINGS_FILE, settings);
+    res.json({
+      success: true,
+      message: "Connected to MongoDB Atlas! All library data is now permanently persisted in the cloud.",
+      status: cloudStorage.getStatus()
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: `Could not connect to MongoDB: ${err.message}`
+    });
+  }
+});
+
 app.get("/api/status", (req, res) => {
   const books = readJson(BOOKS_FILE, []);
   const categories = readJson(CATEGORIES_FILE, DEFAULT_CATEGORIES);
@@ -330,13 +416,14 @@ app.get("/api/status", (req, res) => {
   res.json({
     status: "online",
     name: "PayLib Dynamic Backend",
-    version: "2.0.0",
+    version: "2.1.0",
     totalBooks: books.length,
     availableBooks: books.filter(b => b.status === "Available").length,
     borrowedBooks: books.filter(b => b.status === "Borrowed").length,
     categoriesCount: Object.keys(categories).length,
     uptimeSeconds: Math.floor(process.uptime()),
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    cloud: cloudStorage.getStatus()
   });
 });
 
@@ -521,7 +608,7 @@ app.post("/api/books", (req, res) => {
   }
 
   const generatedId = (id && String(id).trim()) || `book-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-  const cleanCover = processCoverPhoto(generatedId, coverPhoto);
+  const coverResult = processCoverPhoto(generatedId, coverPhoto);
 
   const cleanCategory = (category || "General").trim();
   const cleanSubCategory = (subCategory || "General").trim();
@@ -539,7 +626,8 @@ app.post("/api/books", (req, res) => {
     status: status === "Borrowed" ? "Borrowed" : "Available",
     shelfLocation: (shelfLocation || "").trim(),
     addedDate: new Date().toISOString().split("T")[0],
-    coverPhoto: cleanCover
+    coverPhoto: coverResult.url,
+    coverPhotoData: coverResult.data || (req.body.coverPhotoData || "")
   };
 
   // Prepend new book
@@ -596,10 +684,13 @@ app.put("/api/books/:id", (req, res) => {
   }
 
   let updatedCover = current.coverPhoto;
+  let updatedCoverData = current.coverPhotoData || "";
   if (coverPhoto !== undefined) {
     if (coverPhoto !== current.coverPhoto) {
       cleanupCoverFile(current.coverPhoto);
-      updatedCover = processCoverPhoto(current.id, coverPhoto);
+      const coverResult = processCoverPhoto(current.id, coverPhoto);
+      updatedCover = coverResult.url;
+      updatedCoverData = coverResult.data || current.coverPhotoData || "";
     }
   }
 
@@ -618,7 +709,8 @@ app.put("/api/books/:id", (req, res) => {
     publisher: publisher !== undefined ? publisher.trim() : current.publisher,
     status: status !== undefined ? (status === "Borrowed" ? "Borrowed" : "Available") : current.status,
     shelfLocation: shelfLocation !== undefined ? shelfLocation.trim() : current.shelfLocation,
-    coverPhoto: updatedCover
+    coverPhoto: updatedCover,
+    coverPhotoData: updatedCoverData
   };
 
   writeJson(BOOKS_FILE, books);
@@ -967,9 +1059,9 @@ app.post("/api/upload", (req, res) => {
     return res.status(400).json({ success: false, message: "Base64 image payload required." });
   }
 
-  const url = processCoverPhoto(filename || "upload", image);
-  if (url && url.startsWith("/uploads/")) {
-    res.status(201).json({ success: true, url });
+  const coverResult = processCoverPhoto(filename || "upload", image);
+  if (coverResult && coverResult.url && coverResult.url.startsWith("/uploads/")) {
+    res.status(201).json({ success: true, url: coverResult.url });
   } else {
     res.status(400).json({ success: false, message: "Failed to process image." });
   }

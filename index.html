@@ -1026,6 +1026,49 @@
           <p class="summary-hint">Backups contain your full catalogue, category hierarchies, covers, and security settings.</p>
         </div>
 
+        <!-- Persistent Cloud Storage & Anti-Sleep Shield Card -->
+        <div class="backup-action-card" style="border: 1.5px solid #1a73e8; background: var(--bg-hover, #f8fafd);">
+          <div class="backup-card-info" style="align-items: flex-start;">
+            <div class="b-icon-wrap blue" style="background: #e8f0fe; color: #1a73e8;">
+              <span class="material-symbols-rounded">cloud_done</span>
+            </div>
+            <div class="b-text-wrap" style="flex: 1;">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                <h4 class="b-card-title" style="margin: 0; font-size: 14.5px;">Cloud Database & Anti-Sleep Shield</h4>
+                <span id="cloudStatusBadge" style="font-size: 11px; padding: 3px 9px; border-radius: 12px; background: #e6f4ea; color: #137333; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                  <span class="pulse-dot" style="width: 7px; height: 7px; background: #1e8e3e; border-radius: 50%; display: inline-block;"></span>
+                  <span>Anti-Sleep Active 💓</span>
+                </span>
+              </div>
+              <p class="b-card-desc" id="cloudStatusDescription" style="margin-top: 4px; font-size: 12px; line-height: 1.4;">
+                Active keep-alive heartbeat pings every 13 minutes to prevent Render free-tier sleep mode. Client auto-restore shield protects data against resets.
+              </p>
+
+              <!-- MongoDB Atlas Integration Field -->
+              <div style="margin-top: 10px; padding: 10px; background: var(--bg-card, #ffffff); border-radius: 8px; border: 1px solid var(--border-color, #e0e0e0);">
+                <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                  <span class="material-symbols-rounded" style="font-size: 16px; color: #1a73e8;">database</span>
+                  <span>MongoDB Atlas Cloud Persistence (Permanent 24/7 Database)</span>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <input type="password" id="mongodbUriInput" placeholder="mongodb+srv://user:pass@cluster.mongodb.net/paylib" style="flex: 1; min-width: 200px; font-size: 12px; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--border-color, #dadce0); background: var(--bg-hover, #f8f9fa); color: var(--text-primary);">
+                  <button type="button" class="gpay-pill-btn primary" id="saveMongoUriBtn" style="font-size: 12px; padding: 6px 14px;">
+                    <span class="material-symbols-rounded" style="font-size: 15px;">cloud_upload</span> Connect Cloud DB
+                  </button>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; flex-wrap: wrap; gap: 6px;">
+                  <span style="font-size: 11px; color: var(--text-tertiary);">
+                    Paste your free MongoDB Atlas URI to permanently store books, categories & covers in the cloud.
+                  </span>
+                  <a href="https://www.mongodb.com/cloud/atlas/register" target="_blank" rel="noopener noreferrer" style="font-size: 11px; color: #1a73e8; font-weight: 600; text-decoration: none;">
+                    Get Free MongoDB Atlas URI ↗
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Export Action Card -->
         <div class="backup-action-card">
           <div class="backup-card-info">

@@ -153,6 +153,47 @@ async function checkBackendConnection() {
   return false;
 }
 
+// Deleted book IDs tombstone tracker to prevent deleted books from resurfacing
+function getDeletedBookIds() {
+  try {
+    return new Set(JSON.parse(localStorage.getItem("gpaylib_deleted_ids") || "[]"));
+  } catch (e) {
+    return new Set();
+  }
+}
+
+function markBookDeleted(id) {
+  if (!id) return;
+  try {
+    const set = getDeletedBookIds();
+    set.add(String(id).toLowerCase());
+    localStorage.setItem("gpaylib_deleted_ids", JSON.stringify([...set]));
+  } catch (e) {}
+}
+
+async function restoreLibraryToBackend(booksToPush, catsToPush, settingsToPush) {
+  try {
+    console.log("[DATA SHIELD] 🛡️ Auto-restoring library data to woken backend...");
+    const res = await fetch(`${API_BASE}/backup/restore`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        data: {
+          books: booksToPush,
+          categories: catsToPush,
+          settings: settingsToPush
+        }
+      })
+    });
+    if (res.ok) {
+      console.log("[DATA SHIELD] 🟢 Successfully restored library to backend!");
+      showToast("Cloud server woke up from sleep mode — auto-synced your library data!", "success");
+    }
+  } catch (err) {
+    console.warn("[DATA SHIELD] Restore push note:", err);
+  }
+}
+
 async function syncFromBackend(forceRefresh = false) {
   if (isSyncInProgress) return;
   isSyncInProgress = true;
@@ -185,12 +226,45 @@ async function syncFromBackend(forceRefresh = false) {
     let booksChanged = false;
     let catsChanged = false;
 
-    // 1. Sync Books with deep diffing
+    // 1. Sync Books with Anti-Data-Loss Shield
     if (Array.isArray(bData.books)) {
-      const bHash = JSON.stringify(bData.books);
+      const deletedIds = getDeletedBookIds();
+
+      // Case A: Backend woke up from sleep mode with empty catalog, but client has books!
+      if (bData.books.length === 0 && books.length > 0) {
+        console.warn("[DATA SHIELD] 🛡️ Backend returned 0 books but local catalog has " + books.length + " books! Server waking from sleep mode detected. Protecting data and auto-restoring!");
+        await restoreLibraryToBackend(books, categoriesMap, { pin: libraryPin, lockEnabled });
+        updateBackendStatusBadge(true, false);
+        return;
+      }
+
+      // Case B: Intelligent reconciliation
+      // Backend has books, check if local has any books missing on backend that were not deleted
+      const backendIdMap = new Set(bData.books.map(b => (b.id || "").toLowerCase()));
+      const backendNoMap = new Set(bData.books.map(b => (b.bookNumber || "").toLowerCase()));
+      const missingLocalBooks = [];
+
+      for (const lb of books) {
+        const idLower = (lb.id || "").toLowerCase();
+        const noLower = (lb.bookNumber || "").toLowerCase();
+        if (!backendIdMap.has(idLower) && !backendNoMap.has(noLower) && !deletedIds.has(idLower) && !deletedIds.has(noLower)) {
+          // This book exists locally and was not deleted — backend lost it during sleep
+          missingLocalBooks.push(lb);
+        }
+      }
+
+      let finalBooks = [...bData.books];
+      if (missingLocalBooks.length > 0) {
+        console.log(`[DATA SHIELD] Found ${missingLocalBooks.length} books in local storage missing on backend. Auto-reconciling...`);
+        finalBooks = [...bData.books, ...missingLocalBooks];
+        // Asynchronously push missing books to backend
+        missingLocalBooks.forEach(b => apiAddBook(b));
+      }
+
+      const bHash = JSON.stringify(finalBooks);
       if (bHash !== lastSyncedBooksHash || forceRefresh) {
         lastSyncedBooksHash = bHash;
-        books = bData.books;
+        books = finalBooks;
         booksChanged = true;
         try {
           localStorage.setItem("gpaylib_books_v2", bHash);
@@ -198,8 +272,8 @@ async function syncFromBackend(forceRefresh = false) {
       }
     }
 
-    // 2. Sync Categories with deep diffing
-    if (cData.categories && typeof cData.categories === "object") {
+    // 2. Sync Categories with Shield
+    if (cData.categories && typeof cData.categories === "object" && Object.keys(cData.categories).length > 0) {
       const cHash = JSON.stringify(cData.categories);
       if (cHash !== lastSyncedCatsHash || forceRefresh) {
         lastSyncedCatsHash = cHash;
@@ -307,6 +381,13 @@ function startAutoBackendSync() {
   backendAutoSyncTimer = setInterval(() => {
     syncFromBackend(false);
   }, BACKEND_SYNC_INTERVAL_MS);
+
+  // 4. Client-side Anti-Sleep Heartbeat every 4 minutes (keeps Render awake while tab is open)
+  setInterval(() => {
+    if (isBackendOnline && !isFileProtocol) {
+      fetch(`${API_BASE}/ping`, { headers: { "X-Client-KeepAlive": "true" } }).catch(() => {});
+    }
+  }, 4 * 60 * 1000);
 }
 
 // Backend API CRUD Operations
@@ -1874,6 +1955,8 @@ async function confirmDeleteBook(book) {
   });
 
   if (confirmed) {
+    markBookDeleted(book.id);
+    if (book.bookNumber) markBookDeleted(book.bookNumber);
     books = books.filter(b => b.id !== book.id && b.bookNumber !== book.bookNumber);
     saveBooksToStorage();
     lastSyncedBooksHash = JSON.stringify(books);
@@ -2947,6 +3030,43 @@ closeStatsBtn2.addEventListener("click", closeStatsModal);
 // ==========================================
 // Backup & Restore Data Logic
 // ==========================================
+async function loadCloudStorageStatus() {
+  const cloudStatusBadge = document.getElementById("cloudStatusBadge");
+  const cloudStatusDescription = document.getElementById("cloudStatusDescription");
+  if (!isBackendOnline) {
+    if (cloudStatusBadge) {
+      cloudStatusBadge.innerHTML = `<span class="status-dot" style="background: #ea8600;"></span><span>Local Storage Protected</span>`;
+      cloudStatusBadge.style.background = "#fef7e0";
+      cloudStatusBadge.style.color = "#b06000";
+    }
+    return;
+  }
+  try {
+    const res = await fetch(`${API_BASE}/cloud-status`);
+    if (res.ok) {
+      const data = await res.json();
+      if (cloudStatusBadge) {
+        if (data.isMongoConnected) {
+          cloudStatusBadge.innerHTML = `<span class="pulse-dot" style="width: 7px; height: 7px; background: #1e8e3e; border-radius: 50%; display: inline-block;"></span><span>MongoDB Atlas Cloud Live ☁️</span>`;
+          cloudStatusBadge.style.background = "#e6f4ea";
+          cloudStatusBadge.style.color = "#137333";
+        } else {
+          cloudStatusBadge.innerHTML = `<span class="pulse-dot" style="width: 7px; height: 7px; background: #1a73e8; border-radius: 50%; display: inline-block;"></span><span>Anti-Sleep Active 💓</span>`;
+          cloudStatusBadge.style.background = "#e8f0fe";
+          cloudStatusBadge.style.color = "#1a73e8";
+        }
+      }
+      if (cloudStatusDescription) {
+        if (data.isMongoConnected) {
+          cloudStatusDescription.textContent = "Permanent MongoDB Atlas cloud database active! All books, categories, and cover photos are permanently stored in the cloud. Data is NEVER lost when the site sleeps.";
+        } else {
+          cloudStatusDescription.textContent = "Keep-alive heartbeat pings every 13 minutes to prevent Render free-tier sleep mode. Client auto-restore shield protects data against resets.";
+        }
+      }
+    }
+  } catch (_) {}
+}
+
 async function openBackupModal() {
   if (backupStatBooks) {
     backupStatBooks.textContent = `${books.length} Books`;
@@ -2971,6 +3091,7 @@ async function openBackupModal() {
   }
 
   fetchServerSnapshots();
+  loadCloudStorageStatus();
   backupModalBackdrop.classList.add("open");
 }
 
@@ -3344,6 +3465,41 @@ function bindEventListeners() {
   if (restoreFileInput) restoreFileInput.addEventListener("change", handleRestoreFileInput);
   if (refreshSnapshotsBtn) refreshSnapshotsBtn.addEventListener("click", fetchServerSnapshots);
   if (resetSampleDataBtn) resetSampleDataBtn.addEventListener("click", handleResetSampleData);
+
+  // Cloud Database & MongoDB Configuration Listener
+  const saveMongoUriBtn = document.getElementById("saveMongoUriBtn");
+  const mongodbUriInput = document.getElementById("mongodbUriInput");
+  if (saveMongoUriBtn) {
+    saveMongoUriBtn.addEventListener("click", async () => {
+      const uri = (mongodbUriInput && mongodbUriInput.value.trim()) || "";
+      if (!uri) {
+        showToast("Please enter your MongoDB connection URI", "warning");
+        return;
+      }
+      saveMongoUriBtn.disabled = true;
+      saveMongoUriBtn.textContent = "Connecting...";
+      try {
+        const res = await fetch(`${API_BASE}/cloud-config`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mongodbUri: uri })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast("Connected to MongoDB Atlas! Data is now permanently stored in cloud.", "success");
+          loadCloudStorageStatus();
+          if (mongodbUriInput) mongodbUriInput.value = "";
+        } else {
+          showToast(data.message || "Failed to connect to MongoDB", "error");
+        }
+      } catch (err) {
+        showToast("Error connecting: " + err.message, "error");
+      } finally {
+        saveMongoUriBtn.disabled = false;
+        saveMongoUriBtn.innerHTML = `<span class="material-symbols-rounded" style="font-size: 15px;">cloud_upload</span> Connect Cloud DB`;
+      }
+    });
+  }
 
   // Cover Uploader trigger
   if (coverUploadBox) {
